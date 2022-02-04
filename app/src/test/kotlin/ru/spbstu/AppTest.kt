@@ -11,4 +11,24 @@ class AppTest {
         val classUnderTest = App()
         assertNotNull(classUnderTest.greeting, "app should have a greeting")
     }
+    @Test fun appHasAGreeting2() {
+        val classUnderTest = App()
+        assertNotNull(classUnderTest.greeting, "app should have a greeting")
+    }
+    @Test fun appHasAGreeting3() {
+        val classUnderTest = App()
+        assertNotNull(classUnderTest.greeting, "app should have a greeting")
+    }
+    @Test fun appHasAGreeting4() {
+        val classUnderTest = App()
+        assertNotNull(classUnderTest.greeting, "app should have a greeting")
+    }
+    @Test fun appHasAGreeting5() {
+        val classUnderTest = App()
+        assertNotNull(classUnderTest.greeting, "app should have a greeting")
+    }
+    @Test fun appHasAGreeting6() {
+        val classUnderTest = App()
+        assertNotNull(classUnderTest.greeting, "app should have a greeting")
+    }
 }
