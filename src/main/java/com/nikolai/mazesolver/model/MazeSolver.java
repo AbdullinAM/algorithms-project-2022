@@ -3,14 +3,11 @@ package com.nikolai.mazesolver.model;
 import java.util.*;
 
 public class MazeSolver {
-    private int width;
-    private int height;
+
 
 
     public Deque<Cell> solve(Maze maze) {
         Maze mazeToSolve = maze.cloneMaze();
-        width = mazeToSolve.getWidth();
-        height = mazeToSolve.getHeight();
         Cell start = mazeToSolve.getStart();
         List<Cell> neighbors = new ArrayList<>();//создали список для соседей
         neighbors.addAll(mazeToSolve.findNeighbor(start.getX(), start.getY()));//нашли соседей начальной точки и добавили их в список

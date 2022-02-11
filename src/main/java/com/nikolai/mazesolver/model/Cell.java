@@ -47,6 +47,7 @@ public class Cell {
     public void makeEnd() {//конец равен 3
         value = 3;
     }
+
     public boolean isEnd() {//это конец или нет
         if (value == 3) {
             return true;

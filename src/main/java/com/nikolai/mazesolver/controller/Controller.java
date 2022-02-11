@@ -4,6 +4,7 @@ import com.nikolai.mazesolver.model.Cell;
 import com.nikolai.mazesolver.model.MazeSolver;
 import com.nikolai.mazesolver.view.ImgCreator;
 import com.nikolai.mazesolver.model.Maze;
+import com.nikolai.mazesolver.view.WarnAlert;
 import javafx.fxml.FXML;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
@@ -19,34 +20,38 @@ public class Controller {
     private ImageView img;
 
     private Maze maze;
-    private ScrollPane scrollPane;
+    private boolean chekClick = false;
 
-    @FXML
-    void initialize() {
-        scrollPane= new ScrollPane();
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollPane.setPannable(true);
-    }
 
     @FXML
     protected void solveMaze() {
-        MazeSolver mazeSolver = new MazeSolver();
-        Deque<Cell> path = mazeSolver.solve(maze);
-        maze.addPath(path);
-        ImgCreator imgCreator = new ImgCreator();
-        BufferedImage newImage = imgCreator.newImage(maze.getMaze());
+        if (chekClick) {
+            MazeSolver mazeSolver = new MazeSolver();
+            Deque<Cell> path = mazeSolver.solve(maze);
+            maze.addPath(path);
+            ImgCreator imgCreator = new ImgCreator();
+            BufferedImage newImage = imgCreator.newImage(maze.getMaze());
+            img.setImage(SwingFXUtils.toFXImage(newImage, null));
+            chekClick = false;
+        } else {
+            WarnAlert.alertSolve();
+        }
 
-        img.setImage(SwingFXUtils.toFXImage(newImage, null));
     }
 
     @FXML
     protected void newMaze() {
-        maze = new Maze(Integer.parseInt(height.getText()), Integer.parseInt(width.getText()));
-        maze.createMaze();
-        ImgCreator imgCreator = new ImgCreator();
-        BufferedImage newImage = imgCreator.newImage(maze.getMaze());
-        img.setImage(SwingFXUtils.toFXImage(newImage, null));
-        scrollPane.setContent(img);
+        if (Integer.parseInt(height.getText()) > 3 && Integer.parseInt(width.getText()) > 3) {
+            maze = new Maze(Integer.parseInt(height.getText()), Integer.parseInt(width.getText()));
+            maze.createMaze();
+            ImgCreator imgCreator = new ImgCreator();
+            BufferedImage newImage = imgCreator.newImage(maze.getMaze());
+            img.setImage(SwingFXUtils.toFXImage(newImage, null));
+            chekClick = true;
+        } else {
+            WarnAlert.warnAlert();
+        }
+
+
     }
 }

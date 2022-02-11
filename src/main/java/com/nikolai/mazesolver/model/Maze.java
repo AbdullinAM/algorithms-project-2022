@@ -53,7 +53,7 @@ public class Maze {
             y = height - 1;
             List<Cell> neighbor= findNeighbor(x, y);
             if(!neighbor.isEmpty()){
-                System.out.println(1);
+                //System.out.println(1);
                 end = maze[x][y];
                 end.makeEnd();
                 break;
@@ -128,7 +128,7 @@ public class Maze {
         Maze mazeToClone = new Maze(height, width);
         for (int i = 0; i < height; i++) {//заполняем наш массив клетками
             for (int j = 0; j < width; j++) {
-                System.out.println(mazeToClone.getMaze()[j][i]);
+                //System.out.println(mazeToClone.getMaze()[j][i]);
                 mazeToClone.getMaze()[j][i] = new Cell(j, i);
                 mazeToClone.getMaze()[j][i].setValue(maze[j][i].getValue());
             }
