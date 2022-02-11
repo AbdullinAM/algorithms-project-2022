@@ -11,7 +11,6 @@ public class Maze {
     private Cell start;
     private Cell end;
 
-
     public Maze(int height, int width) {
         this.height = height;
         this.width = width;
