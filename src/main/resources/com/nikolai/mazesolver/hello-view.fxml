@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" prefHeight="800.0" prefWidth="800.0" spacing="20.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.nikolai.mazesolver.controller.Controller">
+    <ScrollPane prefHeight="800.0" prefWidth="800.0" style="-fx-background-color: #000000;">
+      <content>
+          <VBox>
+              <ImageView fx:id="img" pickOnBounds="true" preserveRatio="true" />
+              <Button onAction="#newMaze" text="Создать новый лабиринт" />
+              <Button onAction="#solveMaze" text="Решить лабиринт" />
+              <TextField fx:id="width" promptText="Width" />
+              <TextField fx:id="height" promptText="Height" />
+          </VBox>
+      </content>
+
+   </ScrollPane>
+</VBox>
