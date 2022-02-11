@@ -12,16 +12,23 @@ public class Maze {
     private Cell end;
 
 
-    public Maze(int height, int width) {
+    public Maze(int height, int width) throws NumberFormatException{
         this.height = height;
         this.width = width;
-        this.maze = new Cell[width][height];//создаем массив Cell размер эквивалентным нашим высоте и ширине
-        for (int i = 0; i < height; i++) {//заполняем наш массив клетками
-            for (int j = 0; j < width; j++) {
-                maze[j][i] = new Cell(j, i);
+        if (height>3 && width>3){
+            this.maze = new Cell[width][height];//создаем массив Cell размер эквивалентным нашим высоте и ширине
+            for (int i = 0; i < height; i++) {//заполняем наш массив клетками
+                for (int j = 0; j < width; j++) {
+                    maze[j][i] = new Cell(j, i);
+                }
             }
+        }else {
+            throw new NumberFormatException("Для корректной генерации лабиринта, высота и ширина должны быть больше 4");
         }
+
     }
+
+
 
     //Алгоритм Прима
     public void createMaze() {

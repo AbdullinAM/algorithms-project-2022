@@ -25,10 +25,6 @@ public class Cell {
         return false;
     }
 
-    public void makeWall() {//стена равна 1
-        value = 1;
-    }
-
     public void makeVisited() {//отметить что мы там были
         value = -1;
     }
