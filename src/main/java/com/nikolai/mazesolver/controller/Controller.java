@@ -4,6 +4,7 @@ import com.nikolai.mazesolver.model.Cell;
 import com.nikolai.mazesolver.model.MazeSolver;
 import com.nikolai.mazesolver.view.ImgCreator;
 import com.nikolai.mazesolver.model.Maze;
+import com.nikolai.mazesolver.view.WarnAlert;
 import javafx.fxml.FXML;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
@@ -42,11 +43,16 @@ public class Controller {
 
     @FXML
     protected void newMaze() {
-        maze = new Maze(Integer.parseInt(height.getText()), Integer.parseInt(width.getText()));
-        maze.createMaze();
-        ImgCreator imgCreator = new ImgCreator();
-        BufferedImage newImage = imgCreator.newImage(maze.getMaze());
-        img.setImage(SwingFXUtils.toFXImage(newImage, null));
-        scrollPane.setContent(img);
+        if(Integer.parseInt(height.getText())>2 && Integer.parseInt(width.getText())>2){
+            maze = new Maze(Integer.parseInt(height.getText()), Integer.parseInt(width.getText()));
+            maze.createMaze();
+            ImgCreator imgCreator = new ImgCreator();
+            BufferedImage newImage = imgCreator.newImage(maze.getMaze());
+            img.setImage(SwingFXUtils.toFXImage(newImage, null));
+            scrollPane.setContent(img);
+        }else {
+            WarnAlert.alertWarn();
+        }
+
     }
 }

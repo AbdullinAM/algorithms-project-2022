@@ -25,7 +25,6 @@ public class Maze {
 
     //Алгоритм Прима
     public void createMaze() {
-
         //Создаем список для хранения границ
         List<Pair<Cell, Cell>> frontiers = new ArrayList<>();
         //Генерируем случайно координаты нашей стартовой ячейки и помещаем в список
