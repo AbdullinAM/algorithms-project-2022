@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class ImgCreator {
+
     private static final int PIXEL_SIZE = 3;
     private static final int IMAGE_TYPE = 5;
 

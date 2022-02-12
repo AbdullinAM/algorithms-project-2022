@@ -14,6 +14,7 @@ import java.awt.image.BufferedImage;
 import java.util.Deque;
 
 public class Controller {
+
     public TextField width;
     public TextField height;
     @FXML
@@ -36,7 +37,6 @@ public class Controller {
         } else {
             WarnAlert.alertSolve();
         }
-
     }
 
     @FXML
@@ -51,7 +51,6 @@ public class Controller {
         } else {
             WarnAlert.warnAlert();
         }
-
-
     }
+
 }

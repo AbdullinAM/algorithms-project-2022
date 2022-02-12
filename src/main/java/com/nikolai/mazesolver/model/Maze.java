@@ -5,6 +5,7 @@ import javafx.util.Pair;
 import java.util.*;
 
 public class Maze {
+
     private final int height;
     private final int width;
     private Cell[][] maze;
@@ -25,13 +26,11 @@ public class Maze {
         } else {
             throw new NumberFormatException("Для корректной генерации лабиринта, высота и ширина должны быть больше 4");
         }
-
     }
 
 
     //Алгоритм Прима
     public void createMaze() {
-
         //Создаем список для хранения границ
         List<Pair<Cell, Cell>> frontiers = new ArrayList<>();
         //Генерируем случайно координаты нашей стартовой ячейки и помещаем в список
@@ -59,12 +58,10 @@ public class Maze {
             y = height - 1;
             List<Cell> neighbor = findNeighbor(x, y);
             if (!neighbor.isEmpty()) {
-                //System.out.println(1);
                 end = maze[x][y];
                 end.makeEnd();
                 break;
             }
-
         }
     }
 

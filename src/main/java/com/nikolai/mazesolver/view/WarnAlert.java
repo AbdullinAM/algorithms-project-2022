@@ -6,13 +6,6 @@ public class WarnAlert {
 
     private static final Alert alert = new Alert(Alert.AlertType.INFORMATION);
 
-    /*public static void alertCreate() {
-        alert.setTitle("Alert");
-        alert.setHeaderText(null);
-        alert.setContentText("");
-        alert.show();
-    }*/
-
     public static void alertSolve() {
         alert.setTitle("Alert");
         alert.setHeaderText(null);
@@ -26,4 +19,5 @@ public class WarnAlert {
         alert.setContentText("Для корректной генерации лабиринта высота и ширина должны быть равны минимум 4");
         alert.show();
     }
+
 }

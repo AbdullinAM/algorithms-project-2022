@@ -11,17 +11,20 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 public class TestSolver {
-    private int width = 50;
-    private int height = 40;
+
+    private final int width = 50;
+    private final int height = 40;
 
 
     @Test
     public void mazeSize() {//проверка, что лабиринт генерируется правильных размеров
         Maze maze = new Maze(height, width);
+
         for (int i = 0; i < 1000; i++) {
             maze.createMaze();
             assertEquals(width, maze.getWidth());
@@ -37,7 +40,6 @@ public class TestSolver {
         assertThrows(NumberFormatException.class, () -> {
             Maze maze1 = new Maze(3, 3);//проверка на неправильные границы
         });
-
     }
 
     @Test
@@ -48,9 +50,28 @@ public class TestSolver {
 
             maze.createMaze();
             Deque<Cell> cellDeque = mazeSolver.solve(maze);
-
+            List<Cell> pathCalls = new ArrayList<>();
+            maze.addPath(cellDeque);
+            pathCalls.add(maze.getStart());
+            pathCalls.add(maze.getEnd());
+            for (int x = 0; x < height; x++) {
+                for (int j = 0; j < width; j++) {
+                    Cell cell = maze.getMaze()[j][x];
+                    if (cell.isVisited()) {
+                        pathCalls.add(cell);
+                    }
+                }
+            }
+            //Суть проверки, что если путь найденный нами перебором всех клеток, эти клетки содержатся
+            //в найденному нами с помощью метода, размеры очереди и списка найденного пути равны, а так же очередь содержит
+            //начальную и конечную клетку в правильных местах(старт в самом начале очереди, а конец в конце), то можно
+            //сделать вывод, что весь путь найден корректно.
+            for (Cell it : cellDeque) {
+                assertTrue(pathCalls.contains(it));//проверка всего пути
+            }
             assertEquals(maze.getStart(), cellDeque.peekFirst());//проверка начальной клетки в очереди
             assertEquals(maze.getEnd(), cellDeque.peekLast());//проверка последней клетки в очереди
+            assertEquals(cellDeque.size(), pathCalls.size());//проверка, что размер пути одинаков
         }
     }
 
@@ -72,7 +93,8 @@ public class TestSolver {
     public void connectedMaze() {//проверка, что лабиринт связный
         //будем проходить по всем точкам и делать каждую точку новым концом
         MazeSolver mazeSolver = new MazeSolver();
-
+        //Обоснование связности(что в лабиринте нет недостижимых островов), если от начальной точки можно дойти до любой
+        //другой, то можно сделать вывод, что в лабиринте нет островов и любая точка достижима.
         for (int x = 0; x < 300; x++) {
             Maze maze = new Maze(height, width);
             maze.createMaze();
@@ -97,15 +119,15 @@ public class TestSolver {
     @Test
     public void setCell() {//проверка, что значение в клетке меняется
         Cell cell = new Cell(5, 6);
-        assertEquals(1, cell.getValue());//проверка, что начальное значение верное
+        assertTrue(cell.isWall());//проверка, что начальное значение верное(то есть стена)
         cell.makeClear();
-        assertEquals(0, cell.getValue());//проверка, что проход делается
+        assertTrue(cell.isClear());//проверка, что проход делается
         cell.makeEnd();
-        assertEquals(3, cell.getValue());//проверка, что конец делается
+        assertTrue(cell.isEnd());//проверка, что конец делается
         cell.makeStart();
         assertEquals(2, cell.getValue());//проверка, что старт делается
         cell.makeVisited();
-        assertEquals(-1, cell.getValue());//проверка, что клетка отмечается как посещенная
+        assertTrue(cell.isVisited());//проверка, что клетка отмечается как посещенная
     }
 
     @Test
@@ -118,10 +140,10 @@ public class TestSolver {
             Deque<Cell> cellDeque = mazeSolver.solve(maze);
             List<Cell> pathCalls = new ArrayList<>();
             maze.addPath(cellDeque);
-            for (int i = 0; i < height; i++) {//заполняем наш массив клетками
+            for (int i = 0; i < height; i++) {
                 for (int j = 0; j < width; j++) {
                     Cell cell = maze.getMaze()[j][i];
-                    if (cell.getValue() == -1) {
+                    if (cell.isVisited()) {
                         pathCalls.add(cell);
                     }
                 }
@@ -129,6 +151,5 @@ public class TestSolver {
             assertEquals(cellDeque.size(), pathCalls.size() + 2);
         }
     }
-
 
 }

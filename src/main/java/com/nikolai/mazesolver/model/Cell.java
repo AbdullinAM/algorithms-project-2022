@@ -6,34 +6,29 @@ public class Cell {
     private final int x;
     private final int y;
     private int value = 1; //по нашему алгоритму у нас изначально все это стены
-    //private int priority;
-    /*public enum Type{
+
+    private enum CellType {
         VISITED(-1),
         SPACE(0),
         WALL(1),
         START(2),
         END(3);
 
-        private int code;
+        private final int code;
 
-        Type(int code){
-        this.code=code;
+        CellType(int code) {
+            this.code = code;
         }
 
         public int getCode() {
             return code;
         }
 
-        public void setCode(int code) {
-            this.code = code;
-        }
-
         @Override
         public String toString() {
             return String.valueOf(code);
         }
-    }*/
-
+    }
 
     public Cell(int x, int y) {
         this.x = x;
@@ -41,40 +36,35 @@ public class Cell {
     }
 
     public void makeClear() {//проход равен 0
-        value = 0;
+        value = CellType.SPACE.code;
     }
 
     public boolean isClear() {//это проход или нет
-        if (value == 0) {
-            return true;
-        }
-        return false;
+        return value == CellType.SPACE.code;
     }
 
     public void makeVisited() {//отметить что мы там были
-        value = -1;
+        value = CellType.VISITED.code;
+    }
+
+    public boolean isVisited() {
+        return  value == CellType.VISITED.code;
     }
 
     public boolean isWall() {//это стена или нет
-        if (value == 1) {
-            return true;
-        }
-        return false;
+        return value == CellType.WALL.code;
     }
 
     public void makeStart() {//начало равно 2
-        value = 2;
+        value = CellType.START.code;
     }
 
     public void makeEnd() {//конец равен 3
-        value = 3;
+        value = CellType.END.code;
     }
 
     public boolean isEnd() {//это конец или нет
-        if (value == 3) {
-            return true;
-        }
-        return false;
+        return value == CellType.END.code;
     }
 
     public int getX() {
