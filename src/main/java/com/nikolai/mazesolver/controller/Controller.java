@@ -6,16 +6,16 @@ import com.nikolai.mazesolver.view.ImgCreator;
 import com.nikolai.mazesolver.model.Maze;
 import com.nikolai.mazesolver.view.WarnAlert;
 import javafx.fxml.FXML;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.control.TextField;
 
 import java.awt.image.BufferedImage;
 import java.util.Deque;
 
 public class Controller {
-    public javafx.scene.control.TextField width;
-    public javafx.scene.control.TextField height;
+    public TextField width;
+    public TextField height;
     @FXML
     private ImageView img;
 

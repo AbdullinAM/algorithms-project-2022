@@ -4,8 +4,6 @@ import java.util.*;
 
 public class MazeSolver {
 
-
-
     public Deque<Cell> solve(Maze maze) {
         Maze mazeToSolve = maze.cloneMaze();
         Cell start = mazeToSolve.getStart();
@@ -33,7 +31,6 @@ public class MazeSolver {
         }
         return deque;
     }
-
 
 
 }

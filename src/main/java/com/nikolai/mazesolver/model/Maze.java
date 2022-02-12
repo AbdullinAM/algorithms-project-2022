@@ -7,27 +7,26 @@ import java.util.*;
 public class Maze {
     private final int height;
     private final int width;
-    private Cell[][] maze ;
+    private Cell[][] maze;
     private Cell start;
     private Cell end;
 
 
-    public Maze(int height, int width) throws NumberFormatException{
+    public Maze(int height, int width) throws NumberFormatException {
         this.height = height;
         this.width = width;
-        if (height>3 && width>3){
+        if (height > 3 && width > 3) {
             this.maze = new Cell[width][height];//создаем массив Cell размер эквивалентным нашим высоте и ширине
             for (int i = 0; i < height; i++) {//заполняем наш массив клетками
                 for (int j = 0; j < width; j++) {
                     maze[j][i] = new Cell(j, i);
                 }
             }
-        }else {
+        } else {
             throw new NumberFormatException("Для корректной генерации лабиринта, высота и ширина должны быть больше 4");
         }
 
     }
-
 
 
     //Алгоритм Прима
@@ -55,11 +54,11 @@ public class Maze {
             }
         }
         start.makeStart();//Тут мы делаем из начальной клетки стартовую
-        while (true){//Тут мы делаем из рандомной боковой клетки конечную
+        while (true) {//Тут мы делаем из рандомной боковой клетки конечную
             x = random.nextInt(width);
             y = height - 1;
-            List<Cell> neighbor= findNeighbor(x, y);
-            if(!neighbor.isEmpty()){
+            List<Cell> neighbor = findNeighbor(x, y);
+            if (!neighbor.isEmpty()) {
                 //System.out.println(1);
                 end = maze[x][y];
                 end.makeEnd();

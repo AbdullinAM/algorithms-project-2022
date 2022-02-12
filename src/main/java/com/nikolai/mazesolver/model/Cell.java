@@ -7,6 +7,32 @@ public class Cell {
     private final int y;
     private int value = 1; //по нашему алгоритму у нас изначально все это стены
     //private int priority;
+    /*public enum Type{
+        VISITED(-1),
+        SPACE(0),
+        WALL(1),
+        START(2),
+        END(3);
+
+        private int code;
+
+        Type(int code){
+        this.code=code;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public void setCode(int code) {
+            this.code = code;
+        }
+
+        @Override
+        public String toString() {
+            return String.valueOf(code);
+        }
+    }*/
 
 
     public Cell(int x, int y) {

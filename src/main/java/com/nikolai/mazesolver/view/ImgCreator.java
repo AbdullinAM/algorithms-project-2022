@@ -25,7 +25,7 @@ public class ImgCreator {
                 for (int pixelX = 0; pixelX < PIXEL_SIZE; pixelX++) {
                     for (int pixelY = 0; pixelY < PIXEL_SIZE; pixelY++) {
                         //System.out.println(x + " | " + y);
-                        Color color= colorCell(maze[x][y]);
+                        Color color = colorCell(maze[x][y]);
                         result.setRGB(y * PIXEL_SIZE + pixelY, x * PIXEL_SIZE + pixelX, color.getRGB());
                     }
                 }
@@ -35,8 +35,8 @@ public class ImgCreator {
     }
 
 
-    public Color colorCell(Cell cell){
-        Color color = new Color(0,0,0);
+    public Color colorCell(Cell cell) {
+        Color color = new Color(0, 0, 0);
         if (cell.getValue() == 1) {
             color = Color.BLACK;
         }
