@@ -1,4 +1,4 @@
-package ru.spbstu.klss.hex.model
+package ru.spbstu.klss.hex.view
 
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.graphics.Texture
