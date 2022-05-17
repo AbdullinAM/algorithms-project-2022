@@ -7,8 +7,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle
 import com.badlogic.gdx.utils.ScreenUtils
 
 
@@ -21,8 +21,8 @@ class MainMenuScreen(val game: Hex) : Screen {
 	var table: Table? = null
 
 
-	var button: TextButton? = null
-	var textButtonStyle: TextButtonStyle? = null
+	var button: ImageButton? = null
+	var ImagButtomStyle: ImageButtonStyle? = null
 
 
 
@@ -31,23 +31,31 @@ class MainMenuScreen(val game: Hex) : Screen {
 	}
 
 	override fun show() {
-		camera.setToOrtho(false, 720f, 480f)
+		camera.setToOrtho(false, 1080f, 720f)
 		stage = Stage()
 		Gdx.input.inputProcessor = stage
 		skin = Skin()
-		buttonAtlas = TextureAtlas(Gdx.files.internal("buttons/buttons.pack"))
+		buttonAtlas = TextureAtlas(Gdx.files.internal("assets/packs/start_pack/start.atlas"))
 		skin!!.addRegions(buttonAtlas)
 
 		table = Table()
+		table!!.background = skin!!.getDrawable("table")
 
-		textButtonStyle = TextButtonStyle()
-		textButtonStyle!!.font = game.font
-		textButtonStyle!!.up = skin!!.getDrawable("up-button")
-		textButtonStyle!!.down = skin!!.getDrawable("down-button")
-		textButtonStyle!!.checked = skin!!.getDrawable("checked-button")
-		button = TextButton("Start game", textButtonStyle)
+		ImagButtomStyle = ImageButtonStyle()
+		ImagButtomStyle!!.up = skin!!.getDrawable("up")
+		ImagButtomStyle!!.down = skin!!.getDrawable("down")
+		ImagButtomStyle!!.checked = skin!!.getDrawable("check")
+		button = ImageButton(ImagButtomStyle)
 
-		table!!.add(button)
+		val nimb = ImageButtonStyle()
+		nimb.up = skin!!.getDrawable("table")
+		nimb.down = skin!!.getDrawable("down")
+		nimb.checked = skin!!.getDrawable("check")
+
+
+		table!!.add(button).padLeft(1080f)//.padBottom(900f)
+		table!!.row()
+		table!!.add(ImageButton(nimb)).padLeft(1080f).padBottom(900f)
 		stage!!.addActor(table)
 	}
 

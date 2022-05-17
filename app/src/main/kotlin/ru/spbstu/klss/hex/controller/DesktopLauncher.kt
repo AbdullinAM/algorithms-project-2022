@@ -11,7 +11,7 @@ object DesktopLauncher {
     fun main(arg: Array<String>) {
         val config = Lwjgl3ApplicationConfiguration()
         config.setForegroundFPS(60)
-        config.setWindowedMode(720,480)
+        config.setWindowedMode(1080,720)
         config.setTitle("HEX")
         Lwjgl3Application(Hex(), config)
     }
