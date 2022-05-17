@@ -11,15 +11,46 @@ class Model {
                 this.board.add(Cell(x, y))
                 if (x > 0) getCell(x, y).connectWith(getCell(x - 1, y))
                 if (y > 0) getCell(x, y).connectWith(getCell(x, y - 1))
-                if (x < 10 && y > 0) getCell(x, y).connectWith(getCell(x + 1, y - 1))
+                if (x > 0 && y > 0) getCell(x, y).connectWith(getCell(x - 1, y - 1))
             }
         }
     }
 
+    override fun toString(): String {
+        var result = ""
+        for (y in 0..10) {
+            var row = ""
+            for (x in 0..10) {
+                val cell = getCell(x, y)
+                when(cell.color) {
+                    Color.GRAY -> row += "- "
+                    Color.RED -> row += "R "
+                    Color.BLUE -> row += "B "
+                }
+            }
+            row += "\n"
+            result += row
+        }
+        return result
+    }
+
     fun getCell(index: Int): Cell = board[index]
+
     fun getCell(x: Int, y: Int): Cell {
         val index = 11 * y + x
         return getCell(index)
+    }
+
+    fun setCellColor(cell: Cell, color: Color) {
+        cell.color = color
+    }
+
+    fun setCellColor(index: Int, color: Color) {
+        getCell(index).color = color
+    }
+
+    fun setCellColor(x: Int, y: Int, color: Color) {
+        getCell(x, y).color = color
     }
 
     fun isWinner(color: Color): Boolean {
@@ -28,13 +59,11 @@ class Model {
                 val cell = getCell(0, y)
                 if (hasPath(cell, color)) return true
             }
-            return false
         } else if (color == Color.BLUE) {
             for (x in 0..10) {
                 val cell = getCell(x, 0)
                 if (hasPath(cell, color)) return true
             }
-            return false
         }
         return false
     }
