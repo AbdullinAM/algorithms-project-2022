@@ -28,6 +28,9 @@ dependencies {
 
     // This dependency is used by the application.
     implementation("com.google.guava:guava:30.1.1-jre")
+    implementation("com.badlogicgames.gdx:gdx:1.11.0")
+    implementation("com.badlogicgames.gdx:gdx-backend-lwjgl3:1.11.0")
+    implementation("com.badlogicgames.gdx:gdx-platform:1.11.0:natives-desktop")
 
     // Use the Kotlin test library.
     testImplementation("org.jetbrains.kotlin:kotlin-test")
