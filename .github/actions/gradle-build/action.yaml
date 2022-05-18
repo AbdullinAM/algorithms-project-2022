@@ -10,7 +10,7 @@ runs:
     - name: Check test report exists # if project has no tests then report is not generated
       shell: bash
       run: |
-        if [[ -z $(find . -path "*build/test-results/test/TEST-*.xml") ]]
+        if [[ -z $(find . -path "*core/build/test-results/test/TEST-*.xml") ]]
         then
           echo "No tests found"
           exit 1

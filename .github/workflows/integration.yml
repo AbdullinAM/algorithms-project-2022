@@ -19,11 +19,11 @@ jobs:
       - name: Check maven build
         if: hashFiles('pom.xml') != ''
         uses: ./.github/actions/maven-build
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
       - name: Check gradle build
         if: hashFiles('gradlew') != ''
         uses: ./.github/actions/gradle-build
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
       - name: Fail if build system is not detected
         if: hashFiles('pom.xml') == '' && hashFiles('gradlew') == ''
         run: |
