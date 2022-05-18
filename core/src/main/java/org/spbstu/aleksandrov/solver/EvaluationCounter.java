@@ -46,7 +46,7 @@ public class EvaluationCounter {
         Arrays.fill(lockHeights, 22);
         int i = 0;
         for (Tetromino solution : solutions) {
-            if (solution != null){
+            if (solution != null) {
                 for (Tetromino.Coordinate coordinate : solution.getCoordinates()) {
                     int y = coordinate.getY();
                     if (y < lockHeights[i]) lockHeights[i] = y;

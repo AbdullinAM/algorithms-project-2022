@@ -1,5 +1,6 @@
 package org.spbstu.aleksandrov.controller;
 
+import com.badlogic.gdx.Gdx;
 import org.spbstu.aleksandrov.model.GameSession;
 import org.spbstu.aleksandrov.solver.Solver;
 
@@ -42,6 +43,10 @@ public class Robot extends RobotInput {
                 }
             }
         }
+        if (game.getFallingTetromino().getCoordinates().get(0).getX() != solver.getBestLocation()[0].getCoordinates().get(0).getX() ||
+                game.getFallingTetromino().getCoordinates().get(0).getY() != solver.getBestLocation()[0].getCoordinates().get(0).getY())
+            Gdx.app.error("ERROR", "MISMATCH");
+
         game.updateFallingProjection();
         return game.hardDrop();
     }

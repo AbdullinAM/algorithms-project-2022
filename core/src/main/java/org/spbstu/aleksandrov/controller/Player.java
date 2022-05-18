@@ -3,13 +3,12 @@ package org.spbstu.aleksandrov.controller;
 import org.spbstu.aleksandrov.model.GameSession;
 import org.spbstu.aleksandrov.solver.Solver;
 import org.spbstu.aleksandrov.util.MovementListener;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Deque;
 
 import static org.spbstu.aleksandrov.model.Tetromino.Movement;
 
-@SuppressWarnings("all")
+// Work in progress
 public class Player extends RobotInput {
 
     private int pressedKey = 0;
@@ -20,23 +19,17 @@ public class Player extends RobotInput {
     private GameSession gameSession;
     private MovementListener listener;
 
-    // WIP
     public Player(Solver solver, GameSession game) {
-        throwException();
         this.solver = solver;
         this.gameSession = game;
         listener = new MovementListener(this);
         game.getFallingTetromino().setListener(listener);
     }
 
-    private void throwException() {
-        throw new NotImplementedException();
-    }
-
     @Override
     public boolean takeAction() {
 
-         if (solution == null || k >= solution.size()) {
+        if (solution == null || k >= solution.size()) {
             solution = solver.getMovements();
             k = 0;
             takingAction = true;

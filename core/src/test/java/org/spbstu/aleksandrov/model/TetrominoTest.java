@@ -1,6 +1,6 @@
 package org.spbstu.aleksandrov.model;
 
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ public class TetrominoTest {
 
     private static final List<Tetromino> tetrominoes = new ArrayList<>();
 
-    @BeforeClass
+    @BeforeAll
     public static void setup() {
         for (Tetromino.Type type : Tetromino.Type.values()) {
             tetrominoes.add(new Tetromino(type));

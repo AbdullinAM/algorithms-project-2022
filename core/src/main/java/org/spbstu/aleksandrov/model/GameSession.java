@@ -1,19 +1,16 @@
 package org.spbstu.aleksandrov.model;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Preferences;
-
 import java.util.Random;
 
 import static org.spbstu.aleksandrov.model.Tetromino.Type.*;
 
 public class GameSession {
 
-    private final Tetromino.Type[] bucket = { L, J, S, Z, T, I, O };
+    private final Tetromino.Type[] bucket = {L, J, S, Z, T, I, O};
     public static final int[] FRAMES_PER_STEP = {
             48, 43, 38, 33, 28, 23, 18, 13, 8, 6, 5, 5, 5, 4, 4, 4, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1
     };
-    private final int[] POINTS = { 40, 100, 300, 1200 };
+    private final int[] POINTS = {40, 100, 300, 1200};
     private final Random random = new Random();
     private Tetromino fallingTetromino;
     private Tetromino fallingProjection;
@@ -21,17 +18,15 @@ public class GameSession {
 
     private int counter = 0;
     private int score = 0;
+    private int highScore;
     private int level = 1;
     private int tCounter = 0;
     private int linesCleared;
     private final GameField gameField;
     private boolean gameOver = false;
-    private final Preferences prefs = Gdx.app.getPreferences("Tetris_User_Data");
 
-    private int highScore;
-
-    public GameSession() {
-        highScore = prefs.getInteger("HighScore", 0);
+    public GameSession(int highScore) {
+        this.highScore = highScore;
         shuffleBucket();
         nextTetromino = new Tetromino(bucket[counter]);
         counter++;
@@ -42,9 +37,8 @@ public class GameSession {
 
     public void updateFallingProjection() {
         fallingProjection = fallingTetromino.clone();
-        while (gameField.areCellsEmpty(fallingProjection.getCoordinates())) {
+        while (gameField.areCellsEmpty(fallingProjection.getCoordinates()))
             fallingProjection.move(0, -1);
-        }
         fallingProjection.move(0, 1);
     }
 
@@ -54,26 +48,14 @@ public class GameSession {
 
         if (!gameField.areCellsEmpty(fallingTetromino.getCoordinates())) {
             fallingTetromino.move(0, 1);
-            gameField.stackTetromino(fallingTetromino);
-            int lines = gameField.checkLinesToClear(fallingTetromino.getCoordinates());
-            gameField.cleanLines();
-            linesCleared += lines;
-            level = linesCleared / 10 + 1;
-            if (lines != 0) score += (level + 1) * POINTS[lines - 1];
-            if (score > highScore) {
-                highScore = score;
-                prefs.putInteger("HighScore", highScore);
-                prefs.flush();
-            }
-            generateNewTetromino();
-            if (gameOver) return;
             updateFallingProjection();
+            hardDrop();
         }
     }
 
     public boolean hardDrop() {
-        int blocks = fallingTetromino.getCoordinates().get(0).getY() -
-                fallingProjection.getCoordinates().get(0).getY();
+        int blocks = fallingTetromino.getRotationPoint().getY() -
+                fallingProjection.getRotationPoint().getY();
         score += blocks;
         gameField.stackTetromino(fallingProjection);
         int lines = gameField.checkLinesToClear(fallingProjection.getCoordinates());
@@ -81,11 +63,7 @@ public class GameSession {
         linesCleared += lines;
         level = linesCleared / 10 + 1;
         if (lines != 0) score += (level + 1) * POINTS[lines - 1];
-        if (score > highScore) {
-            highScore = score;
-            prefs.putInteger("HighScore", highScore);
-            prefs.flush();
-        }
+        if (score > highScore) highScore = score;
         generateNewTetromino();
         updateFallingProjection();
         return true;
@@ -115,7 +93,8 @@ public class GameSession {
         counter++;
 
         fallingTetromino.move(0, -2);
-        while (!gameField.areCellsEmpty(fallingTetromino.getCoordinates())) fallingTetromino.move(0, 1);
+        while (!gameField.areCellsEmpty(fallingTetromino.getCoordinates()))
+            fallingTetromino.move(0, 1);
         ready = true;
     }
 
@@ -166,7 +145,7 @@ public class GameSession {
     }
 
     public void setLevel(int level) {
-        linesCleared = level * 10;
+        linesCleared = (level - 1) * 10;
         this.level = level;
     }
 

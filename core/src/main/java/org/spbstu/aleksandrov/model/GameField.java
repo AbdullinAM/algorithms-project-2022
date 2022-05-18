@@ -11,25 +11,18 @@ public class GameField {
 
     private final CellType[][] gameField = new CellType[22][10];
 
-    private static final Coordinate[/*from what state rotation is*/][/*number of attempt*/] wallKickData = {
-            { new Coordinate(-1, 0), new Coordinate(-1, 1),
-                    new Coordinate(0, -2), new Coordinate(-1, -2) },
-            { new Coordinate(1, 0), new Coordinate(1, -1),
-                    new Coordinate(0, 2), new Coordinate(1, 2) },
-            { new Coordinate(1, 0), new Coordinate(1, 1),
-                    new Coordinate(0, -2), new Coordinate(1, -2) },
-            { new Coordinate(-1, 0), new Coordinate(-1, -1),
-                    new Coordinate(0, 2), new Coordinate(-1, 2) }
+    private static final Coordinate[][/*number of attempt*/] wallKickData = {
+            {new Coordinate(-1, 0), new Coordinate(-1, 1),
+                    new Coordinate(0, -2), new Coordinate(-1, -2)}
     };
 
-    private static final Coordinate[/**/][/*number of attempt*/] wallKickDataI = {
-            { new Coordinate(-2, 0), new Coordinate(1, 0),
-                    new Coordinate(-2, -1), new Coordinate(1, 2) },
-            { new Coordinate(-1, 0), new Coordinate(2, 0),
-                    new Coordinate(-1, 2), new Coordinate(2, -1) },
+    private static final Coordinate[][/*number of attempt*/] wallKickDataI = {
+            {new Coordinate(-2, 0), new Coordinate(1, 0),
+                    new Coordinate(-2, -1), new Coordinate(1, 2)},
+            {new Coordinate(-1, 0), new Coordinate(2, 0),
+                    new Coordinate(-1, 2), new Coordinate(2, -1)},
     };
 
-    // TODO merge with Tetromino.Type
     @SuppressWarnings("unused")
     public enum CellType {
         ORANGE, BLUE, GREEN, RED, PURPLE, CYAN, YELLOW, SPACE
@@ -54,7 +47,7 @@ public class GameField {
 
     ArrayList<Integer> linesToClear = new ArrayList<>(4);
 
-    // Pass to this method coordinates recently stacked tetromino
+    // Pass to this method the coordinates of the recently stacked tetromino
     public int checkLinesToClear(ArrayList<Coordinate> coordinates) {
 
         int result = 0;
@@ -80,8 +73,8 @@ public class GameField {
     }
 
     public void cleanLines() {
-        Collections.sort(linesToClear, Collections.<Integer>reverseOrder());
-        // move down whole field above cleaned line
+        linesToClear.sort(Collections.reverseOrder());
+        // move the whole field above cleaned lines down
         for (int n : linesToClear) {
             for (int j = n + 1; j < 22; j++) {
                 System.arraycopy(gameField[j], 0, gameField[j - 1], 0, 10);
@@ -118,12 +111,14 @@ public class GameField {
                     tetromino.move(offset);
                 }
                 if (tetromino.getType() != Tetromino.Type.I) {
-                    offset = source[state][attempt].deepClone();
+                    offset = source[0][attempt].deepClone();
+                    if (state % 2 == 1) offset.negation();
+                    if (state / 2 == 1) offset.setX(-offset.getX());
                     if (direction == ROT_L && state % 2 == 0) offset.setX(-offset.getX());
-                }
-                else {
+                } else {
                     int index;
-                    if (direction == ROT_L) index = (state + 1) % 2; else index = state % 2;
+                    if (direction == ROT_L) index = (state + 1) % 2;
+                    else index = state % 2;
                     offset = source[index][attempt].deepClone();
                     if ((state > 1 && direction == ROT_R) ||
                             (state > 0 && state < 3 && direction == ROT_L))
@@ -141,7 +136,7 @@ public class GameField {
             return;
         }
 
-        // if state changed then rotation was done, Listener is notified
+        // if the state has changed, then a rotation has been performed, the Listener is notified
         if (state != tetromino.getState()) tetromino.notifyListener(direction);
     }
 

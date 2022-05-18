@@ -89,40 +89,18 @@ public class Solver {
             // Generate following positions
             for (Movement movement : Movement.values()) {
                 Tetromino tetromino = current.getTetromino().clone();
-                switch (movement) {
-                    case DOWN:
-                        tetromino.move(0, -1);
-                        break;
-                    case LEFT:
-                        tetromino.move(-1, 0);
-                        break;
-                    case RIGHT:
-                        tetromino.move(1, 0);
-                        break;
-                    case ROT_L: // anticlockwise
-                        field.rotateOnField(ROT_L, tetromino);
-                        break;
-                    case ROT_R: // clockwise
-                        field.rotateOnField(ROT_R, tetromino);
-                        break;
-                }
+                if (movement == ROT_L || movement == ROT_R)
+                    gameSession.getGameField().rotateOnField(movement, tetromino);
+                else tetromino.move(movement);
                 boolean condition = field.areCellsEmpty(tetromino.getCoordinates());
                 if (condition) {
                     // here only push to queue new positions
                     int x = tetromino.getCoordinates().get(0).getX();
                     int y = tetromino.getCoordinates().get(0).getY();
                     int state = tetromino.getState();
-                    // TODO Tetrominoes I, S, Z has only 2 unique different states,
-                    //  but tetromino.getCoordinates().get(0) for "same" states will be diffirent
                     if (!visited[counter][x][y][state]) {
-                        if (ROBOT) {
-                            // no restrictions
-                            if (!visited[counter][x][y][state]) {
-                                visited[counter][x][y][state] = true;
-                                queue.add(new Position(current, tetromino.clone(), movement, 0));
-                            }
-                        } else {
-                            // restrictions associated with level
+                        if (PLAYER) {
+                            // restrictions associated with level (PLAYER plays)
                             int limit;
                             if (level <= 30) limit = GameSession.FRAMES_PER_STEP[level - 1];
                             else limit = 1;
@@ -137,6 +115,12 @@ public class Solver {
                                     visited[counter][x][y][state] = true;
                                     queue.add(new Position(current, tetromino.clone(), movement, 0));
                                 }
+                            }
+                        } else {
+                            // no restrictions (ROBOT plays or HINTS enabled)
+                            if (!visited[counter][x][y][state]) {
+                                visited[counter][x][y][state] = true;
+                                queue.add(new Position(current, tetromino.clone(), movement, 0));
                             }
                         }
                     }
@@ -185,7 +169,6 @@ public class Solver {
         lastCounter = -1;
         this.gameSession = gameSession;
         robot.update(gameSession);
-        //this.robot = new Robot(this, gameSession);
     }
 
     public static class Position {

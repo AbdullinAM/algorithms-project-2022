@@ -54,11 +54,9 @@ project(":core") {
 
     dependencies {
 
-        testCompile "junit:junit:4.13.2"
-
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
 
-        testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.8.0-M1'
+        testImplementation('org.junit.jupiter:junit-jupiter:5.5.2')
     }
 }

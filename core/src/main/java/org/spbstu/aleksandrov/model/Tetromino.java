@@ -165,7 +165,6 @@ public class Tetromino implements Cloneable {
 
     public void place(int x, int y) {
         move(x - rotationPoint.getX(), y - rotationPoint.getY());
-        //else move(x - coordinates.get(0).getX(), y - coordinates.get(0).getY());
     }
 
     public boolean areCoordinatesPossible() {

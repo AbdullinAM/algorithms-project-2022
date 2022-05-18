@@ -6,9 +6,9 @@ import org.spbstu.aleksandrov.model.GameSession;
 
 public abstract class RobotInput implements Input {
 
-     public boolean takeAction() {
-         return false;
-     }
+    public boolean takeAction() {
+        return false;
+    }
 
     @Override
     public boolean isKeyPressed(int key) {
