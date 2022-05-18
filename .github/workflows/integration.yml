@@ -21,6 +21,7 @@ jobs:
         uses: ./.github/actions/maven-build
       - name: Check gradle build
         if: hashFiles('gradlew') != ''
+        run: chmod +x gradlew
         uses: ./.github/actions/gradle-build
       - name: Fail if build system is not detected
         if: hashFiles('pom.xml') == '' && hashFiles('gradlew') == ''
