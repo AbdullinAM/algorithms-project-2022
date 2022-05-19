@@ -57,11 +57,11 @@ class MainMenuScreen(val game: Hex) : Screen {
 
         twoPlayerButton = ImageButton(startButtonStyle)// must be override !!!!
         twoPlayerButton.addListener(object : ChangeListener() {
-                override fun changed(event: ChangeEvent?, actor: Actor?) {
-                    game.screen = GameScreen()
-                }
+            override fun changed(event: ChangeEvent?, actor: Actor?) {
+                game.screen = GameScreen(game)
             }
-            )
+        }
+        )
 
         buttom2 = ImageButton(startButtonStyle)// must be override !!!!
         buttom3 = ImageButton(startButtonStyle)// must be override !!!!
