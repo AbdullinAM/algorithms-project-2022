@@ -3,7 +3,6 @@ package ru.spbstu.klss.hex.model
 class Model {
 
     val board: MutableList<Cell>
-        get() = field.toMutableList()
 
     init {
         this.board = mutableListOf<Cell>()
