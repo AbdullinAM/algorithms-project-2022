@@ -69,11 +69,11 @@ class GameScreen(val game: Hex) : Screen {
             override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
                 val pair = fromPixelsToInts(screenX.toFloat(), screenY.toFloat())
                 this@GameScreen.coordinatesToReDraw = Pair(pair.first, pair.second)
+                this@GameScreen.touch()
                 return true
             }
         }
 
-        touch()
         linedShapeRenderer.end()
         filledShapeRenderer.end()
     }
