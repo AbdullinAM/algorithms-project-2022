@@ -73,7 +73,7 @@ class Model {
         val stack = ArrayDeque<Pair<Cell, MutableIterator<Cell>>>()
         var currentCell = cell
         var currentIterator = currentCell.neighbours.iterator()
-        val visited = mutableListOf<Cell>(currentCell)
+        val visited = mutableSetOf<Cell>(currentCell)
         stack.add(Pair(currentCell, currentIterator))
 
         while (stack.isNotEmpty()) {
