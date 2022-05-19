@@ -57,12 +57,12 @@ class Model {
         if (color == Color.RED) {
             for (y in 0..10) {
                 val cell = getCell(0, y)
-                if (hasPath(cell, color)) return true
+                if (hasPath(cell, color)) return true // may be just return hasPath(cell, color) ?
             }
         } else if (color == Color.BLUE) {
             for (x in 0..10) {
                 val cell = getCell(x, 0)
-                if (hasPath(cell, color)) return true
+                if (hasPath(cell, color)) return true  // may be just return hasPath(cell, color) ?
             }
         }
         return false
