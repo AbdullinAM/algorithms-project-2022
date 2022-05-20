@@ -12,6 +12,7 @@
    * Если вы используете Maven, то вам необходимо явно указать необходимую версию JDK (не ниже 1.8). Пример конфигурации
    для Java и JDK 11:
    ```xml
+   
    <properties>
         <jvm.version>11</jvm.version>
         <maven.compiler.source>${jvm.version}</maven.compiler.source>

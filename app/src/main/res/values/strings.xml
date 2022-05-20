@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">15-puzzle</string>
+    <string name="start_button">Start</string>
+    <string name="rules_button">Rules</string>
+    <string name="exit_button">Exit</string>
+    <string name="back_button">Back</string>
+    <string name="solver_button">Solve</string>
+    <string name="menu_button">Back to menu</string>
+    <string name="rules_text">The goal of the game is to arrange the tiles in ascending order by moving them around inside the box, preferably with as few moves as possible.</string>
+</resources>
