@@ -13,6 +13,7 @@ class AlexSolver(color: Color) : Solver{
     val enemyColor = if (selfColor == Color.RED) Color.BLUE else Color.RED
     val currentBoard: MutableList<Cell> = Model().board
     val moveOrder = mutableListOf<Pair<Int, Int>>()
+    val linitDepth = 2
 
     val bridgeScore = 2
     val savedBridgeScore = 3
@@ -20,7 +21,28 @@ class AlexSolver(color: Color) : Solver{
     val cellCountMultiplier = 1
 
     override fun action(board: MutableList<Cell>): Pair<Int, Int> { // returns X and Y
-        TODO()
+        var maxScore = -1000
+        var result_x = -1
+        var result_y = -1
+        for (element in getCells(board, Color.GRAY)) {
+            element.color = selfColor
+            if (step(board, 1) > maxScore) {
+                result_x = element.x
+                result_y = element.y
+            }
+        }
+        return Pair(result_x, result_y)
+    }
+
+    fun step(board: MutableList<Cell>, depth: Int): Int {
+        val scoreList = mutableListOf<Int>()
+        if (depth == linitDepth) return countScore(board, selfColor) - countScore(board, enemyColor)
+        for (element in getCells(board, Color.GRAY)) {
+            element.color = if (depth % 2 == 0) selfColor else enemyColor
+            scoreList.add(step(board, depth + 1))
+            element.reset()
+        }
+        return if (depth % 2 == 0) scoreList.maxOrNull() ?: -1000 else scoreList.minOrNull() ?: 1000
     }
 
     fun countScore(board: MutableList<Cell>, color: Color): Int {

@@ -16,4 +16,14 @@ class Cell(val x: Int, val y: Int) {
             cell.connectWith(this)
         }
     }
+
+    fun copy(): Cell {
+        val result = Cell(x, y)
+        result.color = color
+        return result
+    }
+
+    fun reset() {
+        color = Color.GRAY
+    }
 }
