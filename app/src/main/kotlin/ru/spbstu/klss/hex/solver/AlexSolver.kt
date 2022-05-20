@@ -62,7 +62,7 @@ class AlexSolver(color: Color) : Solver{
             for (j in i + 1 until currentCellList.size) {
                 val cell1 = currentCellList[i]
                 val cell2 = currentCellList[j]
-                if (isBridge(cell1, cell2) and !isBlockedBridge(cell1, cell2, board, color)) {
+                if (isBridge(cell1, cell2) and !isBlockedBridge(cell1, cell2, board)) {
                     bridgeCount++
                 }
             }
@@ -142,12 +142,12 @@ class AlexSolver(color: Color) : Solver{
         return false
     }
 
-    fun isBlockedBridge(cell1: Cell, cell2: Cell, board: MutableList<Cell>, currentColor: Color): Boolean {
+    fun isBlockedBridge(cell1: Cell, cell2: Cell, board: MutableList<Cell>): Boolean {
         if (!isBridge(cell1, cell2)) return false
         val deltaX = cell1.x - cell2.x
         val deltaY = cell1.y - cell2.y
         val bridgeNeibhours: Pair<Cell, Cell>
-        val oppositeColor = if (currentColor == Color.RED) Color.BLUE else Color.RED
+        val oppositeColor = if (cell1.color == Color.RED) Color.BLUE else Color.RED
 
         if (abs(deltaX) == 2) bridgeNeibhours = Pair(
             board[countIndex((cell1.x + cell2.x) / 2, cell1.y)],

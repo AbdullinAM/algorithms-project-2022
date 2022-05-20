@@ -43,6 +43,15 @@ class CellTest {
         assertEquals(Color.RED, cellRedToBlue.color, message = "Cell changes color from ${Color.RED} to ${Color.BLUE}, when doesn't")
         assertEquals(Color.BLUE, cellBlueToRed.color, message = "Cell changes color from ${Color.BLUE} to ${Color.RED}, when doesn't")
 
+        cellRedToBlue.reset()
+        cellBlueToRed.reset()
+
+        cellRedToBlue.color = Color.BLUE
+        cellBlueToRed.color = Color.RED
+
+        assertEquals(Color.BLUE, cellRedToBlue.color)
+        assertEquals(Color.RED, cellBlueToRed.color)
+
         println("All clear")
     }
 

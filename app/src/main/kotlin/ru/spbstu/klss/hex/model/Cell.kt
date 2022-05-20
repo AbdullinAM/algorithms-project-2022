@@ -3,7 +3,7 @@ package ru.spbstu.klss.hex.model
 class Cell(val x: Int, val y: Int) {
     var color: Color = Color.GRAY
         set(color) {
-            if (field == Color.GRAY) {
+            if (field == Color.GRAY || color == Color.GRAY) {
                 field = color
             }
         }
@@ -24,6 +24,6 @@ class Cell(val x: Int, val y: Int) {
     }
 
     fun reset() {
-        color = Color.GRAY
+        this.color = Color.GRAY
     }
 }
