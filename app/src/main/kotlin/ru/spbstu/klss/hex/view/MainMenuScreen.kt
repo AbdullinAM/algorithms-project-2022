@@ -103,13 +103,17 @@ class MainMenuScreen(val game: Hex) : Screen {
     override fun resize(width: Int, height: Int) {}
 
 
-    override fun hide() {}
+    override fun hide() {
+        dispose()
+    }
 
     override fun pause() {}
 
     override fun resume() {}
 
-    override fun dispose() {}
+    override fun dispose() {
+        stage.dispose()
+        buttonAtlas.dispose()
 
-
+    }
 }

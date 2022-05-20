@@ -7,9 +7,17 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils.sin
 import com.badlogic.gdx.math.MathUtils.cos
+import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Image
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ru.spbstu.klss.hex.model.Model
 import java.lang.Math.PI
@@ -20,6 +28,8 @@ import ru.spbstu.klss.hex.model.Color.BLUE as BLUE
 
 class GameScreen(val game: Hex) : Screen {
 
+    private lateinit var table: Table
+    private lateinit var stage: Stage
     private lateinit var viewport: FitViewport
     private lateinit var camera: OrthographicCamera
     private lateinit var linedShapeRenderer: ShapeRenderer
@@ -32,6 +42,7 @@ class GameScreen(val game: Hex) : Screen {
     private val size = 30f
     private val centerX = 300f
     private val centerY = -100f
+    private var gameOver = false
 
     override fun show() {
         batch = SpriteBatch()
@@ -44,11 +55,10 @@ class GameScreen(val game: Hex) : Screen {
         viewport = FitViewport(camera.viewportWidth, camera.viewportHeight, camera)
         linedShapeRenderer.projectionMatrix = camera.combined
         filledShapeRenderer.projectionMatrix = camera.combined
-
     }
 
     override fun render(delta: Float) {
-
+        gameOver = model.isWinner(fromViewToModelColor())
         Gdx.gl.glEnable(GL20.GL_BLEND)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
@@ -57,22 +67,9 @@ class GameScreen(val game: Hex) : Screen {
         linedShapeRenderer.begin(ShapeRenderer.ShapeType.Line)
         filledShapeRenderer.begin(ShapeRenderer.ShapeType.Filled)
 
-        linedShapeRenderer.color = Color.BLACK
-        linedShapeRenderer.line(0f, 0f, 0f, 300f, -300f, 0f)
-
-        fieldRender()
-        if (model.isWinner(fromViewToModelColor())) {
-            println("GAME OVER + $currentColor WIN!!")
-        }
-
-        Gdx.input.inputProcessor = object : InputAdapter() {
-            override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-                val pair = fromPixelsToInts(screenX.toFloat(), screenY.toFloat())
-                this@GameScreen.coordinatesToReDraw = Pair(pair.first, pair.second)
-                this@GameScreen.touch()
-                return true
-            }
-        }
+        if (gameOver) {
+            gameOver()
+        } else fieldRender()
 
         linedShapeRenderer.end()
         filledShapeRenderer.end()
@@ -82,17 +79,23 @@ class GameScreen(val game: Hex) : Screen {
         val x = coordinatesToReDraw.first
         val y = coordinatesToReDraw.second
         if (x == -1) return
-        model.getCell(x, y).color = fromViewToModelColor()
+        val oldCellColor = model.getCell(x, y).color
+        val newCellColor = fromViewToModelColor()
 
-        if (model.isWinner(fromViewToModelColor())) {
-            println("GAME OVER + $currentColor WIN!!")
-        }
+        if (oldCellColor == newCellColor) return
+
+        model.getCell(x, y).color = newCellColor
+        if (!model.isWinner(fromViewToModelColor()))
+            changeTurn()
+    }
+
+    private fun changeTurn() {
         currentColor = if (currentColor == Color.RED) Color.BLUE
         else Color.RED
     }
 
-    private fun reDrawPickedHex(coordX: Int, coordY: Int) {
-
+    private fun gameOver() {
+        game.screen = GameOverScreen(game, currentColor)
     }
 
     private fun fromPixelsToInts(screenX: Float, screenY: Float): Pair<Int, Int> {
@@ -127,14 +130,14 @@ class GameScreen(val game: Hex) : Screen {
             pixWidth = deltaX - 3.0 / 4.0 * sectorWidth
             if (deltaY < sectorHeight / 2.0) {
                 //верних угол
-                pixHeight = deltaY.toDouble()
+                pixHeight = deltaY
                 if (pixHeight / pixWidth < tan) {
                     cellY--
                     println("right-up : X: $cellX , Y: $cellY")
                 }
             } else {
                 //нижний угол
-                pixHeight = (sectorHeight - deltaY).toDouble()
+                pixHeight = (sectorHeight - deltaY)
                 if (pixHeight / pixWidth < tan) {
                     cellY++
                     cellX++
@@ -143,10 +146,10 @@ class GameScreen(val game: Hex) : Screen {
             }
         } else if (deltaX < sectorWidth / 4.0) {
             //левый угол
-            pixWidth = deltaX.toDouble()
+            pixWidth = deltaX
             if (deltaY < sectorHeight / 2.0) {
                 //верних угол
-                pixHeight = deltaY.toDouble()
+                pixHeight = deltaY
                 if (pixHeight / pixWidth < tan) {
                     cellY--
                     cellX--
@@ -154,7 +157,7 @@ class GameScreen(val game: Hex) : Screen {
                 }
             } else {
                 //нижний угол
-                pixHeight = (sectorHeight - deltaY).toDouble()
+                pixHeight = (sectorHeight - deltaY)
                 if (pixHeight / pixWidth < tan) {
                     cellY++
                     println("left-down : X: $cellX , Y: $cellY")
@@ -171,8 +174,8 @@ class GameScreen(val game: Hex) : Screen {
     }
 
     private fun fromViewToModelColor(): ModelColor {
-        if (this.currentColor == Color.RED) return ModelColor.RED
-        return ModelColor.BLUE
+        if (this.currentColor == Color.RED) return RED
+        return BLUE
     }
 
     private fun fromModelToViewColor(modelColor: ModelColor): Color {
@@ -187,8 +190,8 @@ class GameScreen(val game: Hex) : Screen {
             for (x in 0..10) {
                 linedShapeRenderer.color = Color.WHITE
                 val vertices = fillHexPattern(
-                    centerX + x * (1.75f * size - 1f) - y * (1.75f * size - 1f) / 2,
-                    centerY + -y * (1.75f * size - 1f) * sqrt(3f) / 2,
+                    centerX + x * (1.75f * size) - y * (1.75f * size) / 2,
+                    centerY + -y * (1.75f * size) * sqrt(3f) / 2,
                 )
                 val color = model.getCell(x, y).color
                 fillHexWithColor(vertices, fromModelToViewColor(color))
@@ -263,6 +266,15 @@ class GameScreen(val game: Hex) : Screen {
                 }
             }
         }
+
+        Gdx.input.inputProcessor = object : InputAdapter() {
+            override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+                val pair = fromPixelsToInts(screenX.toFloat(), screenY.toFloat())
+                this@GameScreen.coordinatesToReDraw = Pair(pair.first, pair.second)
+                this@GameScreen.touch()
+                return true
+            }
+        }
     }
 
     private fun fillHexWithColor(vertices: FloatArray, color: Color) {
@@ -324,11 +336,12 @@ class GameScreen(val game: Hex) : Screen {
     }
 
     override fun hide() {
-
+        dispose()
     }
 
     override fun dispose() {
-        linedShapeRenderer.end()
-        filledShapeRenderer.end()
+        batch.dispose()
+        linedShapeRenderer.dispose()
+        filledShapeRenderer.dispose()
     }
 }
