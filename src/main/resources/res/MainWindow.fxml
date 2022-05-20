@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="320.0" maxWidth="280.0" minHeight="320.0" minWidth="280.0" prefHeight="320.0" prefWidth="280.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainWindowController">
+   <children>
+      <Button defaultButton="true" layoutX="140.0" layoutY="273.0" maxHeight="25.0" maxWidth="120.0" minHeight="25.0" minWidth="120.0" mnemonicParsing="false" onAction="#startSolution" prefHeight="25.0" prefWidth="120.0" text="Решить" />
+      <Button layoutX="20.0" layoutY="273.0" maxHeight="25.0" maxWidth="120.0" minHeight="25.0" minWidth="120.0" mnemonicParsing="false" onAction="#startGeneration" prefHeight="25.0" prefWidth="120.0" text="Сгенерировать" />
+   </children>
+</AnchorPane>

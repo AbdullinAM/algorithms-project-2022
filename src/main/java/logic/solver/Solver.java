@@ -1,43 +1,48 @@
 package logic.solver;
 
+import loading.MainWindow;
 import logic.fifteen.State;
 import java.util.*;
 
 public class Solver {
 
     private final List<State> result = new ArrayList<>();
+    private final State currentState;
 
+    private PriorityQueue<State> priorityQueue = new PriorityQueue<>(20, new Comparator<State>() {
+        @Override
+        public int compare(State o1, State o2) {
+            return Integer.compare(measure(o1), measure(o2));
+        }
+    });
 
     public Solver(State initial) {
+        priorityQueue.add(initial);
+        currentState = initial;
+    }
 
-        if(isSolvable(initial)) return;
+    public void solve() {
 
-        PriorityQueue<State> priorityQueue = new PriorityQueue<>(20, new Comparator<State>() {
-            @Override
-            public int compare(State o1, State o2) {
-                return Integer.compare(measure(o1), measure(o2));
-            }
-        });
-
-        priorityQueue.add(new State(initial.blocks, null));
+        if(!isSolvable(currentState)) return;
 
         while (true) {
-            State State2 = priorityQueue.poll();
 
-
-            assert State2 != null;
-            if(State2.isGoal()) {
-                stateToList(new State(State2.getBlocks(), State2));
+            State state2 = priorityQueue.poll();
+            assert state2 != null;
+            MainWindow.initButtons(toArrayList(state2.blocks));
+            if(state2.isGoal()) {
+                stateToList(new State(state2.getBlocks(), state2));
                 return;
             }
 
-            for (State board1 : State2.neighbors()) {
-                if (board1 != null && !containsInPath(State2, board1)) {
-                    priorityQueue.add(new State(State2.getBlocks(), board1));
+            for (State board1 : state2.neighbors()) {
+                if (board1 != null && !containsInPath(state2, board1)) {
+                    priorityQueue.add(new State(state2.getBlocks(), board1));
                 }
             }
         }
     }
+
 
     private static int measure(State currentState){
         State currentState2 = currentState;
@@ -106,4 +111,11 @@ public class Solver {
         return result;
     }
 
+    public static int[][] convertToArray(ArrayList<Integer> list) {
+        int[][] result = new int[4][4];
+        for (int i = 0; i < list.size(); i++) {
+            result[i / 4][i % 4] = list.get(i);
+        }
+        return result;
+    }
 }
