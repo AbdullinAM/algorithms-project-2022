@@ -67,7 +67,13 @@ class MainMenuScreen(val game: Hex) : Screen {
         }
         )
 
-        twoSolverButton = ImageButton(startButtonStyle)// must be override !!!!
+        twoSolverButton = ImageButton(startButtonStyle)
+        twoSolverButton.addListener(object : ChangeListener() {
+            override fun changed(event: ChangeEvent?, actor: Actor?) {
+                game.screen = GameScreen(game,AlexSolver(Color.BLUE), human = true)
+            }
+        }
+        )// must be override !!!!
         //
         humanAndSolverButton = ImageButton(startButtonStyle)// must be override !!!!
         humanAndSolverButton.addListener(object : ChangeListener() {

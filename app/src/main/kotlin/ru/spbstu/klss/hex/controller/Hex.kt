@@ -1,6 +1,7 @@
 package ru.spbstu.klss.hex.controller
 
 import com.badlogic.gdx.Game
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import ru.spbstu.klss.hex.view.MainMenuScreen
@@ -11,7 +12,6 @@ class Hex : Game() {
 
     override fun create() {
         batch = SpriteBatch()
-        font = BitmapFont() // use libGDX's default Arial font
         setScreen(MainMenuScreen(this))
     }
 

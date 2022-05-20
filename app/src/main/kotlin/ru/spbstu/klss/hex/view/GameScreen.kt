@@ -10,13 +10,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils.cos
 import com.badlogic.gdx.math.MathUtils.sin
-import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.utils.TimeUtils
 import com.badlogic.gdx.utils.Timer
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ru.spbstu.klss.hex.controller.Hex
-import ru.spbstu.klss.hex.model.Cell
 import ru.spbstu.klss.hex.model.Color.BLUE
 import ru.spbstu.klss.hex.model.Color.RED
 import ru.spbstu.klss.hex.model.Model
@@ -43,6 +39,10 @@ class GameScreen(
     private var currentPlayer = 0//Random.nextInt(0, 1)
     private val turnQueue = ArrayList<String>()
 
+    private val delayConst = 1.6f
+    private var delay: Float = delayConst
+    private var playerMakeMove = false
+
     private var coordinatesToReDraw = Pair(-1, 1)
     private val size = 30f
     private val centerX = 300f
@@ -60,7 +60,6 @@ class GameScreen(
         viewport = FitViewport(camera.viewportWidth, camera.viewportHeight, camera)
         linedShapeRenderer.projectionMatrix = camera.combined
         filledShapeRenderer.projectionMatrix = camera.combined
-
         if (human) turnQueue.add("human")
         if (solverFirst != null) turnQueue.add("solverFirst")
         if (solverSecond != null) turnQueue.add("solverSecond")
@@ -83,14 +82,20 @@ class GameScreen(
             fieldRender()
         }
 
-        println("curPlayer = ${currentPlayer} ; name = ${turnQueue[currentPlayer]}")
-        println("bot1 = $solverFirst ; bot2 = $solverSecond")
-        if (turnQueue[currentPlayer] == "solverFirst") {
+        //println("curPlayer = ${currentPlayer} ; name = ${turnQueue[currentPlayer]}")
+        //println("bot1 = $solverFirst ; bot2 = $solverSecond")
+        if(playerMakeMove && delay > 0f)
+            delay -= delta
+
+        else { if (turnQueue[currentPlayer] == "solverFirst") {
             if (solverFirst != null)
                 coordinatesToReDraw = solverFirst.action(model.board.toMutableList())
             makeMove()
             print("Alex make move")
-        }
+            delay = delayConst
+            playerMakeMove = false
+        }}
+
 
         if (turnQueue[currentPlayer] == "solverSecond") {
             val delay = 2f // seconds
@@ -135,80 +140,7 @@ class GameScreen(
         game.screen = GameOverScreen(game, currentColor)
     }
 
-    private fun fromPixelsToInts(screenX: Float, screenY: Float): Pair<Int, Int> {
-        println("screenX: $screenX , ScreenY: $screenY")
-        val padX = centerX - 5.5 * sqrt(3f) * size
-        val sectorHeight = 3.0 / 2.0 * size
-        val sectorWidth = sqrt(3f) * size
-        val pixY = screenY + centerY + sectorHeight / 2.0
-        var pixX = screenX - padX
-        //ориентировочные координаты клетки в массиве
-        var cellY = (pixY / sectorHeight.toInt()).toInt()
-        pixX -= (sectorWidth / 2.0) * (10 - cellY)
-        var cellX = (pixX / sectorWidth.toInt()).toInt()
-        println("OrintX: $cellX , OrintY: $cellY")
 
-        if (cellX < 0 || cellY < 0
-            || cellX > sqrt(model.board.size.toDouble()) - 1
-            || cellY > sqrt(model.board.size.toDouble()) - 1
-        )
-            return Pair(-1, 1)
-        //deltas
-        val deltaY = pixY % sectorHeight
-        val deltaX = pixX % sectorWidth
-
-        val tan = (size / 2.0) / (sqrt(3f) / 2.0 * size)
-
-        val pixHeight: Double
-        val pixWidth: Double
-
-        if (deltaX > 3.0 / 4.0 * sectorWidth) {
-            // правый угол
-            pixWidth = deltaX - 3.0 / 4.0 * sectorWidth
-            if (deltaY < sectorHeight / 2.0) {
-                //верних угол
-                pixHeight = deltaY
-                if (pixHeight / pixWidth < tan) {
-                    cellY--
-                    println("right-up : X: $cellX , Y: $cellY")
-                }
-            } else {
-                //нижний угол
-                pixHeight = (sectorHeight - deltaY)
-                if (pixHeight / pixWidth < tan) {
-                    cellY++
-                    cellX++
-                    println("right-down : X: $cellX , Y: $cellY")
-                }
-            }
-        } else if (deltaX < sectorWidth / 4.0) {
-            //левый угол
-            pixWidth = deltaX
-            if (deltaY < sectorHeight / 2.0) {
-                //верних угол
-                pixHeight = deltaY
-                if (pixHeight / pixWidth < tan) {
-                    cellY--
-                    cellX--
-                    println("left-up : X: $cellX , Y: $cellY")
-                }
-            } else {
-                //нижний угол
-                pixHeight = (sectorHeight - deltaY)
-                if (pixHeight / pixWidth < tan) {
-                    cellY++
-                    println("left-down : X: $cellX , Y: $cellY")
-                }
-            }
-        }
-
-        if (cellX < 0 || cellY < 0
-            || cellX > sqrt(model.board.size.toDouble()) - 1
-            || cellY > sqrt(model.board.size.toDouble()) - 1
-        )
-            return Pair(-1, 1)
-        return Pair(cellX, cellY)
-    }
 
     private fun fromViewToModelColor(): ModelColor {
         if (this.currentColor == Color.RED) return RED
@@ -230,6 +162,7 @@ class GameScreen(
                     val pair = fromPixelsToInts(screenX.toFloat(), screenY.toFloat())
                     this@GameScreen.coordinatesToReDraw = pair
                     this@GameScreen.makeMove()
+                    this@GameScreen.playerMakeMove = true
                 }
                 return true
             }
@@ -360,6 +293,81 @@ class GameScreen(
         val angleDeg = 60f * i + 30f
         val angleRad = PI.toFloat() / 180f * angleDeg
         return Pair(centerX + size * cos(angleRad), centerY + size * sin(angleRad))
+    }
+
+    private fun fromPixelsToInts(screenX: Float, screenY: Float): Pair<Int, Int> {
+        println("screenX: $screenX , ScreenY: $screenY")
+        val padX = centerX - 5.5 * sqrt(3f) * size
+        val sectorHeight = 3.0 / 2.0 * size
+        val sectorWidth = sqrt(3f) * size
+        val pixY = screenY + centerY + sectorHeight / 2.0
+        var pixX = screenX - padX
+        //ориентировочные координаты клетки в массиве
+        var cellY = (pixY / sectorHeight.toInt()).toInt()
+        pixX -= (sectorWidth / 2.0) * (10 - cellY)
+        var cellX = (pixX / sectorWidth.toInt()).toInt()
+        println("OrintX: $cellX , OrintY: $cellY")
+
+        if (cellX < 0 || cellY < 0
+            || cellX > sqrt(model.board.size.toDouble()) - 1
+            || cellY > sqrt(model.board.size.toDouble()) - 1
+        )
+            return Pair(-1, 1)
+        //deltas
+        val deltaY = pixY % sectorHeight
+        val deltaX = pixX % sectorWidth
+
+        val tan = (size / 2.0) / (sqrt(3f) / 2.0 * size)
+
+        val pixHeight: Double
+        val pixWidth: Double
+
+        if (deltaX > 3.0 / 4.0 * sectorWidth) {
+            // правый угол
+            pixWidth = deltaX - 3.0 / 4.0 * sectorWidth
+            if (deltaY < sectorHeight / 2.0) {
+                //верних угол
+                pixHeight = deltaY
+                if (pixHeight / pixWidth < tan) {
+                    cellY--
+                    println("right-up : X: $cellX , Y: $cellY")
+                }
+            } else {
+                //нижний угол
+                pixHeight = (sectorHeight - deltaY)
+                if (pixHeight / pixWidth < tan) {
+                    cellY++
+                    cellX++
+                    println("right-down : X: $cellX , Y: $cellY")
+                }
+            }
+        } else if (deltaX < sectorWidth / 4.0) {
+            //левый угол
+            pixWidth = deltaX
+            if (deltaY < sectorHeight / 2.0) {
+                //верних угол
+                pixHeight = deltaY
+                if (pixHeight / pixWidth < tan) {
+                    cellY--
+                    cellX--
+                    println("left-up : X: $cellX , Y: $cellY")
+                }
+            } else {
+                //нижний угол
+                pixHeight = (sectorHeight - deltaY)
+                if (pixHeight / pixWidth < tan) {
+                    cellY++
+                    println("left-down : X: $cellX , Y: $cellY")
+                }
+            }
+        }
+
+        if (cellX < 0 || cellY < 0
+            || cellX > sqrt(model.board.size.toDouble()) - 1
+            || cellY > sqrt(model.board.size.toDouble()) - 1
+        )
+            return Pair(-1, 1)
+        return Pair(cellX, cellY)
     }
 
 
