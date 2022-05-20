@@ -7,6 +7,7 @@ android {
     compileSdk 32
     lintOptions {
         abortOnError false
+        checkReleaseBuilds false
     }
 
     defaultConfig {
