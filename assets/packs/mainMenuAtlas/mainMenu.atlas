@@ -1,0 +1,83 @@
+
+mainMenuAtlas.png
+size: 2048, 512
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+check
+  rotate: false
+  xy: 468, 204
+  size: 464, 99
+  orig: 464, 99
+  offset: 0, 0
+  index: -1
+down
+  rotate: false
+  xy: 934, 406
+  size: 464, 99
+  orig: 464, 99
+  offset: 0, 0
+  index: -1
+down_humanAndBot_Alex
+  rotate: false
+  xy: 2, 103
+  size: 464, 99
+  orig: 464, 99
+  offset: 0, 0
+  index: -1
+down_humanAndBot_Sema
+  rotate: false
+  xy: 2, 305
+  size: 464, 99
+  orig: 464, 99
+  offset: 0, 0
+  index: -1
+down_twoBots
+  rotate: false
+  xy: 468, 305
+  size: 464, 99
+  orig: 464, 99
+  offset: 0, 0
+  index: -1
+down_twoPlayer
+  rotate: false
+  xy: 2, 204
+  size: 464, 99
+  orig: 464, 99
+  offset: 0, 0
+  index: -1
+up
+  rotate: false
+  xy: 934, 305
+  size: 464, 99
+  orig: 464, 99
+  offset: 0, 0
+  index: -1
+up_humanAndBot_Alex
+  rotate: false
+  xy: 2, 406
+  size: 464, 99
+  orig: 464, 99
+  offset: 0, 0
+  index: -1
+up_humanAndBot_Sema
+  rotate: false
+  xy: 1400, 406
+  size: 464, 99
+  orig: 464, 99
+  offset: 0, 0
+  index: -1
+up_twoBots
+  rotate: false
+  xy: 2, 2
+  size: 464, 99
+  orig: 464, 99
+  offset: 0, 0
+  index: -1
+up_twoPlayer
+  rotate: false
+  xy: 468, 406
+  size: 464, 99
+  orig: 464, 99
+  offset: 0, 0
+  index: -1
