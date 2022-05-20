@@ -286,4 +286,42 @@ class AlexSolverTest {
 
         assertEquals(4, alexSolver.countSavedBridges(model1.board, Color.RED))
     }
+
+    @Test
+    fun countMaxLength() {
+        val emptyModel = Model()
+        val alexSolver = AlexSolver(Color.RED)
+
+        assertEquals(0, alexSolver.countMaxLength(emptyModel.board, Color.RED))
+
+        val model1 = Model()
+
+        //Board view
+        // - - - - - - - - - - -
+        // - - - - - - - - - - -
+        // - - - R R R R R R R -
+        // - - - R - - R - - - -
+        // - - - R - R - - - - -
+        // - - - R R - - - - - -
+        // - - - - R - - - - - -
+        // R - - - - R - - - - -
+        // - R R R R R R - - - -
+        // - - - - - - - - - - -
+        // - - - - - - - - - - -
+
+        for (x in 1..6) model1.setCellColor(x, 8, Color.RED)
+        for (x in 3..7) model1.setCellColor(x, 2, Color.RED)
+        for (y in 2..5) model1.setCellColor(3, y, Color.RED)
+        model1.setCellColor(6, 3, Color.RED)
+        model1.setCellColor(5, 4, Color.RED)
+        model1.setCellColor(4, 5, Color.RED)
+        model1.setCellColor(4, 6, Color.RED)
+        model1.setCellColor(5, 7, Color.RED)
+        model1.setCellColor(0, 7, Color.RED)
+        model1.setCellColor(8, 2, Color.RED)
+        model1.setCellColor(9, 2, Color.RED)
+
+
+        assertEquals(10, alexSolver.countMaxLength(model1.board, Color.RED))
+    }
 }

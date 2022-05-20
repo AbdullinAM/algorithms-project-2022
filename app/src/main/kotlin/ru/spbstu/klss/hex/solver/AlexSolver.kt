@@ -12,13 +12,14 @@ class AlexSolver(color: Color) : Solver{
     val selfColor = color
     val enemyColor = if (selfColor == Color.RED) Color.BLUE else Color.RED
     val currentBoard: MutableList<Cell> = Model().board
-    val moveOrder = mutableListOf<Pair<Int, Int>>()
-    val linitDepth = 2
+    val moveOrder = ArrayDeque<Cell>()
+    val limitDepth = 2
 
-    val bridgeScore = 2
+    val bridgeScore = 3
     val savedBridgeScore = 3
     val sizeMultiplier = 2
     val cellCountMultiplier = 1
+    var iteratorStop = 0
 
     override fun action(board: MutableList<Cell>): Pair<Int, Int> { // returns X and Y
         var maxScore = -1000
@@ -26,31 +27,37 @@ class AlexSolver(color: Color) : Solver{
         var result_y = -1
         for (element in getCells(board, Color.GRAY)) {
             element.color = selfColor
-            if (step(board, 1) > maxScore) {
+            val stepScore = step(board, 1)
+            if (stepScore > maxScore) {
+                maxScore = stepScore
                 result_x = element.x
                 result_y = element.y
             }
+            element.reset()
         }
         return Pair(result_x, result_y)
     }
 
     fun step(board: MutableList<Cell>, depth: Int): Int {
         val scoreList = mutableListOf<Int>()
-        if (depth == linitDepth) return countScore(board, selfColor) - countScore(board, enemyColor)
+        if (depth == limitDepth) return countScore(board)
         for (element in getCells(board, Color.GRAY)) {
-            element.color = if (depth % 2 == 0) selfColor else enemyColor
-            scoreList.add(step(board, depth + 1))
+            element.color = if (depth % 2 == 1) enemyColor else selfColor
+            val score = step(board, depth + 1)
+            scoreList.add(score)
             element.reset()
         }
-        return if (depth % 2 == 0) scoreList.maxOrNull() ?: -1000 else scoreList.minOrNull() ?: 1000
+        return if (depth % 2 == 1) scoreList.minOrNull() ?: -1000 else scoreList.maxOrNull() ?: 1000
     }
 
-    fun countScore(board: MutableList<Cell>, color: Color): Int {
+    fun countScore(board: MutableList<Cell>): Int {
         var score = 0
-        score += countBridges(board, color) * bridgeScore
-        score += countMaxLength(board, color) * sizeMultiplier
-        score += countSavedBridges(board, color) * savedBridgeScore
-        score += getCells(board, color).size * sizeMultiplier
+        score += (countBridges(board, selfColor) - countBridges(board, enemyColor)) * bridgeScore
+        score += countMaxLength(board, selfColor) - countMaxLength(board, enemyColor) * sizeMultiplier
+        score += (countSavedBridges(board, selfColor) - countSavedBridges(board, enemyColor)) * savedBridgeScore
+        score += (getCells(board, selfColor).size - getCells(board, enemyColor).size) * cellCountMultiplier
+        if (countMaxLength(board, selfColor) == 11) score += 1000
+        else if (countMaxLength(board, enemyColor) == 11) score -= 1000
         return score
     }
 
@@ -86,8 +93,8 @@ class AlexSolver(color: Color) : Solver{
             visited.add(currentCell)
             stack.add(Pair(currentCell, currentIterator))
 
-            minCoord = -1
-            maxCoord = 11
+            minCoord = 11
+            maxCoord = -1
 
             while (stack.isNotEmpty()) {
                 currentCell = stack.last().first
@@ -97,8 +104,8 @@ class AlexSolver(color: Color) : Solver{
                         minCoord = min(minCoord, currentCell.y)
                         maxCoord = max(maxCoord, currentCell.y)
                     } else if (currentColor == Color.RED) {
-                        minCoord = min(minCoord, currentCell.y)
-                        maxCoord = max(maxCoord, currentCell.y)
+                        minCoord = min(minCoord, currentCell.x)
+                        maxCoord = max(maxCoord, currentCell.x)
                     }
 
                     val nextCell = currentIterator.next()
@@ -112,7 +119,7 @@ class AlexSolver(color: Color) : Solver{
                 stack.removeLast()
             }
 
-            maxLenght = max(maxLenght, maxCoord - minCoord)
+            maxLenght = max(maxLenght, maxCoord - minCoord + 1)
         }
         return maxLenght
     }
