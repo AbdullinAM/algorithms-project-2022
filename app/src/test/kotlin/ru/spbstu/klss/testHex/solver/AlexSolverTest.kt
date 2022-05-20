@@ -6,6 +6,7 @@ import ru.spbstu.klss.hex.model.Color
 import ru.spbstu.klss.hex.model.Model
 import ru.spbstu.klss.hex.solver.AlexSolver
 import java.util.Random
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -203,4 +204,86 @@ class AlexSolverTest {
         println("All clear")
     }
 
+    @Test
+    fun countBridgesTest(){
+        val emptyModel = Model()
+        val alexSolver = AlexSolver(Color.RED)
+
+        assertEquals(0, alexSolver.countBridges(emptyModel.board, Color.BLUE))
+
+        val model1 = Model()
+        //Board view
+        // - - - - - - - - - - -
+        // - - - - - - - - - - -
+        // - - - - - - - - - - -
+        // - R - - - - - - - - -
+        // - R R - - R - - - - -
+        // - B R R R - - - - - -
+        // - B B B B R - - - - -
+        // - R - - R - - - - - -
+        // - - - - - - - - - - -
+        // - - - - - - - - - - -
+        // - - - - - - - - - - -
+
+        model1.setCellColor(1, 3, Color.RED)
+        model1.setCellColor(1, 4, Color.RED)
+        model1.setCellColor(1, 5, Color.BLUE)
+        model1.setCellColor(1, 6, Color.BLUE)
+        model1.setCellColor(1, 7, Color.RED)
+        model1.setCellColor(2, 4, Color.RED)
+        model1.setCellColor(2, 5, Color.RED)
+        model1.setCellColor(2, 6, Color.BLUE)
+        model1.setCellColor(3, 5, Color.RED)
+        model1.setCellColor(3, 6, Color.BLUE)
+        model1.setCellColor(4, 5, Color.RED)
+        model1.setCellColor(4, 6, Color.BLUE)
+        model1.setCellColor(4, 7, Color.RED)
+        model1.setCellColor(5, 4, Color.RED)
+        model1.setCellColor(5, 6, Color.RED)
+
+        assertEquals(6, alexSolver.countBridges(model1.board, Color.RED))
+    }
+
+    @Test
+    fun countSavedBridgesTest(){
+        val emptyModel = Model()
+        val alexSolver = AlexSolver(Color.RED)
+
+        assertEquals(0, alexSolver.countSavedBridges(emptyModel.board, Color.BLUE))
+
+        val model1 = Model()
+        //Board view
+        // - - - - - - - - - - -
+        // - - - - - - - - - - -
+        // - - - - - - - - - - -
+        // - R - - - - - - - - -
+        // R R R - - R - - - - -
+        // R B R R R - - - - - -
+        // - B B B B R - - - - -
+        // - R - - R R - - - - -
+        // - - - - - - - - - - -
+        // - - - - - - - - - - -
+        // - - - - - - - - - - -
+
+        model1.setCellColor(0, 4, Color.RED)
+        model1.setCellColor(0, 5, Color.RED)
+        model1.setCellColor(1, 3, Color.RED)
+        model1.setCellColor(1, 4, Color.RED)
+        model1.setCellColor(1, 5, Color.BLUE)
+        model1.setCellColor(1, 6, Color.BLUE)
+        model1.setCellColor(1, 7, Color.RED)
+        model1.setCellColor(2, 4, Color.RED)
+        model1.setCellColor(2, 5, Color.RED)
+        model1.setCellColor(2, 6, Color.BLUE)
+        model1.setCellColor(3, 5, Color.RED)
+        model1.setCellColor(3, 6, Color.BLUE)
+        model1.setCellColor(4, 5, Color.RED)
+        model1.setCellColor(4, 6, Color.BLUE)
+        model1.setCellColor(4, 7, Color.RED)
+        model1.setCellColor(5, 4, Color.RED)
+        model1.setCellColor(5, 6, Color.RED)
+        model1.setCellColor(5, 7, Color.RED)
+
+        assertEquals(4, alexSolver.countSavedBridges(model1.board, Color.RED))
+    }
 }
