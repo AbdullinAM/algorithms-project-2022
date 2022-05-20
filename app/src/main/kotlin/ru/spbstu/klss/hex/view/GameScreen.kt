@@ -81,30 +81,38 @@ class GameScreen(val game: Hex) : Screen {
     private fun touch() {
         val x = coordinatesToReDraw.first
         val y = coordinatesToReDraw.second
-        //reDrawPickedHex(x, y)
+        if (x == -1) return
         model.getCell(x, y).color = fromViewToModelColor()
+
+        if (model.isWinner(fromViewToModelColor())) {
+            println("GAME OVER + $currentColor WIN!!")
+        }
         currentColor = if (currentColor == Color.RED) Color.BLUE
         else Color.RED
     }
 
     private fun reDrawPickedHex(coordX: Int, coordY: Int) {
-        if (coordX == -1) return
-        val vertices = fillHexPattern(
-            centerX + coordX * (1.75f * size - 1f) - coordY * (1.75f * size - 1f) / 2,
-            centerY + -coordY * (1.75f * size - 1f) * sqrt(3f) / 2,
-        )
-        fillHexWithColor(vertices, currentColor)
+
     }
 
     private fun fromPixelsToInts(screenX: Float, screenY: Float): Pair<Int, Int> {
-        val sectorHeight = size.toInt()
-        val sectorWidth = (sqrt(3f) * size).toInt()
-        val pixY = (screenY + centerY + size).toInt()
-        var pixX = (screenX - centerX + sqrt(3f) * size).toInt()
+        println("screenX: $screenX , ScreenY: $screenY")
+        val padX = centerX - 5.5 * sqrt(3f) * size
+        val sectorHeight = 3.0 / 2.0 * size
+        val sectorWidth = sqrt(3f) * size
+        val pixY = screenY + centerY + sectorHeight / 2.0
+        var pixX = screenX - padX
         //ориентировочные координаты клетки в массиве
-        var cellY = pixY / sectorHeight
-        pixX -= (sqrt(3f) / 2 * size).toInt() * cellY
-        var cellX = pixX / sectorWidth
+        var cellY = (pixY / sectorHeight.toInt()).toInt()
+        pixX -= (sectorWidth / 2.0) * (10 - cellY)
+        var cellX = (pixX / sectorWidth.toInt()).toInt()
+        println("OrintX: $cellX , OrintY: $cellY")
+
+        if (cellX < 0 || cellY < 0
+            || cellX > sqrt(model.board.size.toDouble()) - 1
+            || cellY > sqrt(model.board.size.toDouble()) - 1
+        )
+            return Pair(-1, 1)
         //deltas
         val deltaY = pixY % sectorHeight
         val deltaX = pixX % sectorWidth
@@ -122,6 +130,7 @@ class GameScreen(val game: Hex) : Screen {
                 pixHeight = deltaY.toDouble()
                 if (pixHeight / pixWidth < tan) {
                     cellY--
+                    println("right-up : X: $cellX , Y: $cellY")
                 }
             } else {
                 //нижний угол
@@ -129,6 +138,7 @@ class GameScreen(val game: Hex) : Screen {
                 if (pixHeight / pixWidth < tan) {
                     cellY++
                     cellX++
+                    println("right-down : X: $cellX , Y: $cellY")
                 }
             }
         } else if (deltaX < sectorWidth / 4.0) {
@@ -140,17 +150,23 @@ class GameScreen(val game: Hex) : Screen {
                 if (pixHeight / pixWidth < tan) {
                     cellY--
                     cellX--
+                    println("left-up : X: $cellX , Y: $cellY")
                 }
             } else {
                 //нижний угол
                 pixHeight = (sectorHeight - deltaY).toDouble()
                 if (pixHeight / pixWidth < tan) {
                     cellY++
+                    println("left-down : X: $cellX , Y: $cellY")
                 }
             }
         }
 
-        if (cellX < 0 || cellY < 0 || cellX > model.board.size - 1 || cellY > model.board.size - 1) return Pair(-1, 1)
+        if (cellX < 0 || cellY < 0
+            || cellX > sqrt(model.board.size.toDouble()) - 1
+            || cellY > sqrt(model.board.size.toDouble()) - 1
+        )
+            return Pair(-1, 1)
         return Pair(cellX, cellY)
     }
 
@@ -174,7 +190,7 @@ class GameScreen(val game: Hex) : Screen {
                     centerX + x * (1.75f * size - 1f) - y * (1.75f * size - 1f) / 2,
                     centerY + -y * (1.75f * size - 1f) * sqrt(3f) / 2,
                 )
-                val color = model.getCell(x,y).color
+                val color = model.getCell(x, y).color
                 fillHexWithColor(vertices, fromModelToViewColor(color))
                 linedShapeRenderer.polygon(vertices)
                 if (y == 0) {
