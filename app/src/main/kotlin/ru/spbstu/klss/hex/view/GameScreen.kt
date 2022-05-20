@@ -10,11 +10,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils.cos
 import com.badlogic.gdx.math.MathUtils.sin
-import com.badlogic.gdx.utils.Timer
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ru.spbstu.klss.hex.controller.Hex
-import ru.spbstu.klss.hex.model.Color.BLUE
-import ru.spbstu.klss.hex.model.Color.RED
+import ru.spbstu.klss.hex.model.Color.*
 import ru.spbstu.klss.hex.model.Model
 import ru.spbstu.klss.hex.solver.Solver
 import java.lang.Math.PI
@@ -41,7 +39,7 @@ class GameScreen(
 
     private val delayConst = 1.6f
     private var delay: Float = delayConst
-    private var playerMakeMove = false
+    private var playerMakeMove = !human
 
     private var coordinatesToReDraw = Pair(-1, 1)
     private val size = 30f
@@ -84,30 +82,28 @@ class GameScreen(
 
         //println("curPlayer = ${currentPlayer} ; name = ${turnQueue[currentPlayer]}")
         //println("bot1 = $solverFirst ; bot2 = $solverSecond")
-        if(playerMakeMove && delay > 0f)
+        if (playerMakeMove && delay > 0f)
             delay -= delta
+        else {
+            if (turnQueue[currentPlayer] == "solverFirst") {
+                if (solverFirst != null)
+                    coordinatesToReDraw = solverFirst.action(model.board.toMutableList())
+                makeMove()
+                delay = delayConst
+                playerMakeMove = !human
+            }
+        }
 
-        else { if (turnQueue[currentPlayer] == "solverFirst") {
-            if (solverFirst != null)
-                coordinatesToReDraw = solverFirst.action(model.board.toMutableList())
-            makeMove()
-            print("Alex make move")
-            delay = delayConst
-            playerMakeMove = false
-        }}
-
-
-        if (turnQueue[currentPlayer] == "solverSecond") {
-            val delay = 2f // seconds
-            Timer.schedule(object : Timer.Task() {
-                override fun run() {
-                    if (solverSecond != null)
-                        coordinatesToReDraw = solverSecond.action(model.board.toMutableList())
-                    makeMove()
-                }
-            }, delay)
-
-
+        if (playerMakeMove && delay > 0f)
+            delay -= delta
+        else {
+            if (turnQueue[currentPlayer] == "solverSecond") {
+                if (solverSecond != null)
+                    coordinatesToReDraw = solverSecond.action(model.board.toMutableList())
+                makeMove()
+                delay = delayConst
+                playerMakeMove = !human
+            }
         }
 
         linedShapeRenderer.end()
@@ -120,11 +116,11 @@ class GameScreen(
 
         //human clicks
         if (x == -1) return
-        val oldCellColor = model.getCell(x, y).color
-        val newCellColor = fromViewToModelColor()
-        if (oldCellColor == newCellColor) return
+        val currentCellColor = model.getCell(x, y).color
+        if (currentCellColor != GRAY) return
 
-        model.getCell(x, y).color = newCellColor
+        model.getCell(x, y).color = fromViewToModelColor()
+
         if (!model.isWinner(fromViewToModelColor()))
             changeTurn()
     }
@@ -139,7 +135,6 @@ class GameScreen(
     private fun gameOver() {
         game.screen = GameOverScreen(game, currentColor)
     }
-
 
 
     private fun fromViewToModelColor(): ModelColor {
@@ -162,7 +157,8 @@ class GameScreen(
                     val pair = fromPixelsToInts(screenX.toFloat(), screenY.toFloat())
                     this@GameScreen.coordinatesToReDraw = pair
                     this@GameScreen.makeMove()
-                    this@GameScreen.playerMakeMove = true
+                    if (turnQueue[currentPlayer] != "human")
+                        this@GameScreen.playerMakeMove = true
                 }
                 return true
             }

@@ -20,19 +20,24 @@ import ru.spbstu.klss.hex.solver.AlexSolver
 
 class MainMenuScreen(val game: Hex) : Screen {
 
-    private lateinit var twoSolverButton: ImageButton  // must be rewrite
-    private lateinit var humanAndSolverButton: ImageButton  // must be rewrite
+    private lateinit var twoSolverButton: ImageButton
+    private lateinit var humanAndAlex: ImageButton
+    private lateinit var humanAndSema: ImageButton
     private lateinit var twoPlayerButton: ImageButton
     private lateinit var startButton: ImageButton
     var camera: OrthographicCamera = OrthographicCamera()
 
     private val stage: Stage = Stage()
     private val skin: Skin = Skin()
-    private val buttonAtlas: TextureAtlas = TextureAtlas(Gdx.files.internal("assets/packs/start_pack/start.atlas"))
+    private val buttonAtlas: TextureAtlas =
+        TextureAtlas(Gdx.files.internal("assets/packs/mainMenuAtlas/mainMenu.atlas"))
     private val table: Table = Table()
 
     private val startButtonStyle: ImageButtonStyle = ImageButtonStyle()
-
+    private val twoSolverButtonStyle: ImageButtonStyle = ImageButtonStyle()
+    private val humanAndAlexStyle: ImageButtonStyle = ImageButtonStyle()
+    private val humanAndSemaStyle: ImageButtonStyle = ImageButtonStyle()
+    private val twoPlayerButtonStyle: ImageButtonStyle = ImageButtonStyle()
 
     override fun show() {
         camera.setToOrtho(false, 1080f, 720f)
@@ -47,19 +52,36 @@ class MainMenuScreen(val game: Hex) : Screen {
         startButtonStyle.down = skin.getDrawable("down")
         startButtonStyle.checked = skin.getDrawable("check")
 
+        twoSolverButtonStyle.up = skin.getDrawable("up_twoBots")
+        twoSolverButtonStyle.down = skin.getDrawable("down_twoBots")
+        twoSolverButtonStyle.checked = skin.getDrawable("up_twoBots")
+
+        humanAndAlexStyle.up = skin.getDrawable("up_humanAndBot_Alex")
+        humanAndAlexStyle.down = skin.getDrawable("down_humanAndBot_Alex")
+        humanAndAlexStyle.checked = skin.getDrawable("up_humanAndBot_Alex")
+
+        humanAndSemaStyle.up = skin.getDrawable("up_humanAndBot_Sema")
+        humanAndSemaStyle.down = skin.getDrawable("down_humanAndBot_Sema")
+        humanAndSemaStyle.checked = skin.getDrawable("up_humanAndBot_Sema")
+
+        twoPlayerButtonStyle.up = skin.getDrawable("up_twoPlayer")
+        twoPlayerButtonStyle.down = skin.getDrawable("down_twoPlayer")
+        twoPlayerButtonStyle.checked = skin.getDrawable("up_twoPlayer")
+
         startButton = ImageButton(startButtonStyle)
         startButton.addListener(object : ChangeListener() {
             override fun changed(event: ChangeEvent?, actor: Actor?) {
                 twoPlayerButton.isVisible = !twoPlayerButton.isVisible
                 twoSolverButton.isVisible = !twoSolverButton.isVisible
-                humanAndSolverButton.isVisible = !humanAndSolverButton.isVisible
+                humanAndAlex.isVisible = !humanAndAlex.isVisible
+                humanAndSema.isVisible = !humanAndSema.isVisible
                 changePadOf(startButton)
                 table.invalidate()
             }
         }
         )
 
-        twoPlayerButton = ImageButton(startButtonStyle)// must be override !!!!
+        twoPlayerButton = ImageButton(twoPlayerButtonStyle)
         twoPlayerButton.addListener(object : ChangeListener() {
             override fun changed(event: ChangeEvent?, actor: Actor?) {
                 game.screen = GameScreen(game, human = true)
@@ -67,31 +89,43 @@ class MainMenuScreen(val game: Hex) : Screen {
         }
         )
 
-        twoSolverButton = ImageButton(startButtonStyle)
+        twoSolverButton = ImageButton(twoSolverButtonStyle)
         twoSolverButton.addListener(object : ChangeListener() {
             override fun changed(event: ChangeEvent?, actor: Actor?) {
-                game.screen = GameScreen(game,AlexSolver(Color.BLUE), human = true)
-            }
-        }
-        )// must be override !!!!
-        //
-        humanAndSolverButton = ImageButton(startButtonStyle)// must be override !!!!
-        humanAndSolverButton.addListener(object : ChangeListener() {
-            override fun changed(event: ChangeEvent?, actor: Actor?) {
-                game.screen = GameScreen(game,AlexSolver(Color.BLUE), human = true)
+                game.screen = GameScreen(game, AlexSolver(Color.BLUE),AlexSolver(Color.RED)/*SemaSolver*/)
             }
         }
         )
+
+        humanAndAlex = ImageButton(humanAndAlexStyle)
+        humanAndAlex.addListener(object : ChangeListener() {
+            override fun changed(event: ChangeEvent?, actor: Actor?) {
+                game.screen = GameScreen(game, AlexSolver(Color.BLUE), human = true)
+            }
+        }
+        )
+
+        humanAndSema = ImageButton(humanAndSemaStyle)
+        humanAndSema.addListener(object : ChangeListener() {
+            override fun changed(event: ChangeEvent?, actor: Actor?) {
+                game.screen = GameScreen(game, /*SemaSolver*/AlexSolver(Color.BLUE), human = true)
+            }
+        }
+        )
+
         twoPlayerButton.isVisible = false
         twoSolverButton.isVisible = false
-        humanAndSolverButton.isVisible = false
+        humanAndAlex.isVisible = false
+        humanAndSema.isVisible = false
 
         table.bottom()
         table.add(twoPlayerButton)
         table.row()
         table.add(twoSolverButton)
         table.row()
-        table.add(humanAndSolverButton)
+        table.add(humanAndAlex)
+        table.row()
+        table.add(humanAndSema)
         table.row()
         table.add(startButton).padBottom(stage.height * 0.7f)
 
@@ -102,7 +136,7 @@ class MainMenuScreen(val game: Hex) : Screen {
         var cell = table.getCell(button)
         if (twoPlayerButton.isVisible) {
             cell.padBottom(0f)
-            cell.padTop(table.height * 0.7f - 3 * button.height)
+            cell.padTop(table.height * 0.7f - 4 * button.height)
 
         } else {
             cell.padBottom(table.height * 0.7f)
