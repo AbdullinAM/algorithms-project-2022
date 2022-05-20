@@ -9,7 +9,6 @@ class Board(field: Array<Array<Cell>>?) {
     var criterion: Int = 0
 
     init {
-
         criterion = 0
         for (x in 0..3) {
             for (y in 0..3) {
