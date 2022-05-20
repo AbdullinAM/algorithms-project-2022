@@ -1,6 +1,5 @@
 package ru.spbstu.klss.hex.controller
 
-import ru.spbstu.klss.hex.view.Hex
 import kotlin.jvm.JvmStatic
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application

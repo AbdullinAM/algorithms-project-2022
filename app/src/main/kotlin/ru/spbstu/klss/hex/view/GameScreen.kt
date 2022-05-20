@@ -7,29 +7,31 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.math.MathUtils.sin
 import com.badlogic.gdx.math.MathUtils.cos
-import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.math.MathUtils.sin
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.Image
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
-import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
+import com.badlogic.gdx.utils.TimeUtils
+import com.badlogic.gdx.utils.Timer
 import com.badlogic.gdx.utils.viewport.FitViewport
+import ru.spbstu.klss.hex.controller.Hex
+import ru.spbstu.klss.hex.model.Cell
+import ru.spbstu.klss.hex.model.Color.BLUE
+import ru.spbstu.klss.hex.model.Color.RED
 import ru.spbstu.klss.hex.model.Model
+import ru.spbstu.klss.hex.solver.Solver
 import java.lang.Math.PI
 import kotlin.math.sqrt
 import ru.spbstu.klss.hex.model.Color as ModelColor
-import ru.spbstu.klss.hex.model.Color.RED as RED
-import ru.spbstu.klss.hex.model.Color.BLUE as BLUE
 
-class GameScreen(val game: Hex) : Screen {
+class GameScreen(
+    val game: Hex,
+    private val solverFirst: Solver? = null,
+    private val solverSecond: Solver? = null,
+    val human: Boolean = false
+) : Screen {
 
-    private lateinit var table: Table
-    private lateinit var stage: Stage
     private lateinit var viewport: FitViewport
     private lateinit var camera: OrthographicCamera
     private lateinit var linedShapeRenderer: ShapeRenderer
@@ -38,6 +40,9 @@ class GameScreen(val game: Hex) : Screen {
 
     private val model = Model()
     private var currentColor = Color.RED
+    private var currentPlayer = 0//Random.nextInt(0, 1)
+    private val turnQueue = ArrayList<String>()
+
     private var coordinatesToReDraw = Pair(-1, 1)
     private val size = 30f
     private val centerX = 300f
@@ -55,6 +60,11 @@ class GameScreen(val game: Hex) : Screen {
         viewport = FitViewport(camera.viewportWidth, camera.viewportHeight, camera)
         linedShapeRenderer.projectionMatrix = camera.combined
         filledShapeRenderer.projectionMatrix = camera.combined
+
+        if (human) turnQueue.add("human")
+        if (solverFirst != null) turnQueue.add("solverFirst")
+        if (solverSecond != null) turnQueue.add("solverSecond")
+        if (turnQueue.size == currentPlayer) currentPlayer--
     }
 
     override fun render(delta: Float) {
@@ -69,19 +79,44 @@ class GameScreen(val game: Hex) : Screen {
 
         if (gameOver) {
             gameOver()
-        } else fieldRender()
+        } else {
+            fieldRender()
+        }
+
+        println("curPlayer = ${currentPlayer} ; name = ${turnQueue[currentPlayer]}")
+        println("bot1 = $solverFirst ; bot2 = $solverSecond")
+        if (turnQueue[currentPlayer] == "solverFirst") {
+            if (solverFirst != null)
+                coordinatesToReDraw = solverFirst.action(model.board.toMutableList())
+            makeMove()
+            print("Alex make move")
+        }
+
+        if (turnQueue[currentPlayer] == "solverSecond") {
+            val delay = 2f // seconds
+            Timer.schedule(object : Timer.Task() {
+                override fun run() {
+                    if (solverSecond != null)
+                        coordinatesToReDraw = solverSecond.action(model.board.toMutableList())
+                    makeMove()
+                }
+            }, delay)
+
+
+        }
 
         linedShapeRenderer.end()
         filledShapeRenderer.end()
     }
 
-    private fun touch() {
+    private fun makeMove() {
         val x = coordinatesToReDraw.first
         val y = coordinatesToReDraw.second
+
+        //human clicks
         if (x == -1) return
         val oldCellColor = model.getCell(x, y).color
         val newCellColor = fromViewToModelColor()
-
         if (oldCellColor == newCellColor) return
 
         model.getCell(x, y).color = newCellColor
@@ -92,6 +127,8 @@ class GameScreen(val game: Hex) : Screen {
     private fun changeTurn() {
         currentColor = if (currentColor == Color.RED) Color.BLUE
         else Color.RED
+        currentPlayer++
+        if (currentPlayer == turnQueue.size) currentPlayer = 0
     }
 
     private fun gameOver() {
@@ -186,6 +223,18 @@ class GameScreen(val game: Hex) : Screen {
 
 
     private fun fieldRender() {
+
+        Gdx.input.inputProcessor = object : InputAdapter() {
+            override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+                if (turnQueue[currentPlayer] == "human") {
+                    val pair = fromPixelsToInts(screenX.toFloat(), screenY.toFloat())
+                    this@GameScreen.coordinatesToReDraw = pair
+                    this@GameScreen.makeMove()
+                }
+                return true
+            }
+        }
+
         for (y in 0..10) {
             for (x in 0..10) {
                 linedShapeRenderer.color = Color.WHITE
@@ -267,14 +316,6 @@ class GameScreen(val game: Hex) : Screen {
             }
         }
 
-        Gdx.input.inputProcessor = object : InputAdapter() {
-            override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-                val pair = fromPixelsToInts(screenX.toFloat(), screenY.toFloat())
-                this@GameScreen.coordinatesToReDraw = Pair(pair.first, pair.second)
-                this@GameScreen.touch()
-                return true
-            }
-        }
     }
 
     private fun fillHexWithColor(vertices: FloatArray, color: Color) {

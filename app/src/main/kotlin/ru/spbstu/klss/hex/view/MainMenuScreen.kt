@@ -13,11 +13,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.utils.ScreenUtils
+import ru.spbstu.klss.hex.controller.Hex
+import ru.spbstu.klss.hex.model.Color
+import ru.spbstu.klss.hex.solver.AlexSolver
 
 
 class MainMenuScreen(val game: Hex) : Screen {
-    private lateinit var buttom3: ImageButton  // must be rewrite
-    private lateinit var buttom2: ImageButton  // must be rewrite
+
+    private lateinit var twoSolverButton: ImageButton  // must be rewrite
+    private lateinit var humanAndSolverButton: ImageButton  // must be rewrite
     private lateinit var twoPlayerButton: ImageButton
     private lateinit var startButton: ImageButton
     var camera: OrthographicCamera = OrthographicCamera()
@@ -37,7 +41,7 @@ class MainMenuScreen(val game: Hex) : Screen {
         skin.addRegions(buttonAtlas)
 
         table.setFillParent(true)
- //       table.debugAll()
+        //       table.debugAll()
 
         startButtonStyle.up = skin.getDrawable("up")
         startButtonStyle.down = skin.getDrawable("down")
@@ -47,8 +51,8 @@ class MainMenuScreen(val game: Hex) : Screen {
         startButton.addListener(object : ChangeListener() {
             override fun changed(event: ChangeEvent?, actor: Actor?) {
                 twoPlayerButton.isVisible = !twoPlayerButton.isVisible
-                buttom2.isVisible = !buttom2.isVisible
-                buttom3.isVisible = !buttom3.isVisible
+                twoSolverButton.isVisible = !twoSolverButton.isVisible
+                humanAndSolverButton.isVisible = !humanAndSolverButton.isVisible
                 changePadOf(startButton)
                 table.invalidate()
             }
@@ -58,23 +62,30 @@ class MainMenuScreen(val game: Hex) : Screen {
         twoPlayerButton = ImageButton(startButtonStyle)// must be override !!!!
         twoPlayerButton.addListener(object : ChangeListener() {
             override fun changed(event: ChangeEvent?, actor: Actor?) {
-                game.screen = GameScreen(game)
+                game.screen = GameScreen(game, human = true)
             }
         }
         )
 
-        buttom2 = ImageButton(startButtonStyle)// must be override !!!!
-        buttom3 = ImageButton(startButtonStyle)// must be override !!!!
+        twoSolverButton = ImageButton(startButtonStyle)// must be override !!!!
+        //
+        humanAndSolverButton = ImageButton(startButtonStyle)// must be override !!!!
+        humanAndSolverButton.addListener(object : ChangeListener() {
+            override fun changed(event: ChangeEvent?, actor: Actor?) {
+                game.screen = GameScreen(game,AlexSolver(Color.BLUE), human = true)
+            }
+        }
+        )
         twoPlayerButton.isVisible = false
-        buttom2.isVisible = false
-        buttom3.isVisible = false
+        twoSolverButton.isVisible = false
+        humanAndSolverButton.isVisible = false
 
         table.bottom()
         table.add(twoPlayerButton)
         table.row()
-        table.add(buttom2)
+        table.add(twoSolverButton)
         table.row()
-        table.add(buttom3)
+        table.add(humanAndSolverButton)
         table.row()
         table.add(startButton).padBottom(stage.height * 0.7f)
 

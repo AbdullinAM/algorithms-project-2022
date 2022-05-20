@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.utils.ScreenUtils
+import ru.spbstu.klss.hex.controller.Hex
 
 class GameOverScreen(val game: Hex, private val currentColor: Color) : Screen {
 
