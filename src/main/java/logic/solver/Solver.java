@@ -7,56 +7,45 @@ public class Solver {
 
     private final List<State> result = new ArrayList<>();
 
-    private static class CurrentState {
-        private final CurrentState parent;
-        private final State State;
-
-        private CurrentState(CurrentState parent, State State) {
-            this.parent = parent;
-            this.State = State;
-        }
-
-        public State getBoard() {
-            return State;
-        }
-    }
 
     public Solver(State initial) {
 
-        if(!isSolvable()) return;
+        if(isSolvable(initial)) return;
 
-        PriorityQueue<CurrentState> priorityQueue = new PriorityQueue<>(10, new Comparator<CurrentState>() {
+        PriorityQueue<State> priorityQueue = new PriorityQueue<>(20, new Comparator<State>() {
             @Override
-            public int compare(CurrentState o1, CurrentState o2) {
+            public int compare(State o1, State o2) {
                 return Integer.compare(measure(o1), measure(o2));
             }
         });
 
-        priorityQueue.add(new CurrentState(null, initial));
+        priorityQueue.add(new State(initial.blocks, null));
 
         while (true) {
-            CurrentState State2 = priorityQueue.poll();
+            State State2 = priorityQueue.poll();
+
 
             assert State2 != null;
-            if(State2.State.isGoal()) {
-                stateToList(new CurrentState(State2, State2.State));
+            if(State2.isGoal()) {
+                stateToList(new State(State2.getBlocks(), State2));
                 return;
             }
 
-            for (State board1 : State2.State.neighbors()) {
-                if (board1 != null && !containsInPath(State2, board1))
-                    priorityQueue.add(new CurrentState(State2, board1));
+            for (State board1 : State2.neighbors()) {
+                if (board1 != null && !containsInPath(State2, board1)) {
+                    priorityQueue.add(new State(State2.getBlocks(), board1));
+                }
             }
         }
     }
 
-    private static int measure(CurrentState currentState){
-        CurrentState currentState2 = currentState;
+    private static int measure(State currentState){
+        State currentState2 = currentState;
         int c = 0;   // g(x)
-        int measure = currentState.getBoard().h();  // h(x)
+        int measure = currentState.h();  // h(x)
         while (true){
             c++;
-            currentState2 = currentState2.parent;
+            currentState2 = currentState2.getParent();
             if(currentState2 == null) {
                 // g(x) + h(x)
                 return measure + c;
@@ -64,31 +53,54 @@ public class Solver {
         }
     }
 
-    private void stateToList(CurrentState currentState){
-        CurrentState currentState2 = currentState;
+    private void stateToList(State currentState){
+        State currentState2 = currentState;
         while (true) {
-            currentState2 = currentState2.parent;
+            currentState2 = currentState2.getParent();
             if(currentState2 == null) {
                 Collections.reverse(result);
                 return;
             }
-            result.add(currentState2.State);
+            result.add(currentState2);
         }
     }
 
-    private boolean containsInPath(CurrentState currentState, State State){
-        CurrentState currentState2 = currentState;
-        while (true){
-            if(currentState2.State.equals(State)) return true;
-            currentState2 = currentState2.parent;
+    private boolean containsInPath(State currentState, State State){
+        State currentState2 = currentState;
+        while (true) {
+            if(currentState2.equals(State)) return true;
+            currentState2 = currentState2.getParent();
             if(currentState2 == null) return false;
         }
     }
 
-    public boolean isSolvable() {
-        return true; //to do
+    public static boolean isSolvable(State state) {
+        int[][] arr = state.blocks;
+        int count = 0;
+        int index = 0;
+        ArrayList<Integer> arrList = toArrayList(arr);
+        for (int i = 0; i < 16; i++) {
+            for (int j = i + 1; j < 15; j++) {
+                if (arrList.get(j) < arrList.get(i)) {
+                    count++;
+                }
+                if (arrList.get(i) == 0) {
+                    index = (i % 4) + 1;
+                }
+            }
+        }
+        return ((count + index) % 2) == 0;
     }
 
+    private static ArrayList<Integer> toArrayList(int[][] arr) {
+        ArrayList<Integer> result = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                result.add(arr[i][j]);
+            }
+        }
+        return result;
+    }
 
     public Iterable<State> solution() {
         return result;
