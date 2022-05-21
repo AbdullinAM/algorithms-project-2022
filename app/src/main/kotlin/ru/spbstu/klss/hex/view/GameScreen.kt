@@ -94,12 +94,12 @@ class GameScreen(
         } else {
             if (turnQueue[currentPlayer] == "human") textPlayer1 = "human"
             else {
-                if (solverFirst != null) {
+                if (solverFirst != null && turnQueue[currentPlayer] == "solverFirst") {
                     textPlayer1 = solverFirst.toString()
                     string = "Turn: " + textPlayer1 + System.getProperty("line.separator") + "" +
                             "turnColor: $textColor"
                 }
-                if (solverSecond != null) {
+                if (solverSecond != null && turnQueue[currentPlayer] == "solverSecond") {
                     textPlayer2 = solverSecond.toString()
                     string = "Turn: " + textPlayer2 + System.getProperty("line.separator") + "" +
                             "turnColor: $textColor"
