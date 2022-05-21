@@ -55,6 +55,18 @@ public class SplayTree<T extends Comparable<T>> extends AbstractSet<T> implement
      * благодаря чему достигается логарифмическая амортизированная оценка.
      *
      * Три вида операции splay: zig, zig-zig, zig-zag.
+     *
+     * x - вершина, которую хотим сделать корнем;
+     * p - родитель x.
+     *
+     * Zig выполняется только один раз в конце, если глубина x - нечётна.
+     *
+     * Zig-zig: если x и p находятся оба либо в левом поддереве, либо в правом - либо оба левые дети, либо правые.
+     *
+     * splay(g, p) -> splay(p, x)
+     *
+     * Zig-zag: если x - левый ребёнок, а p - правый (и наоборот).
+     * splay(p, x) -> splay(g, x)
      */
 
     public Node<T> splay(Node<T> root, T value) {
