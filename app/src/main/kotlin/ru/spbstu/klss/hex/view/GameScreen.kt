@@ -84,12 +84,12 @@ class GameScreen(
                 linedShapeRenderer.line(xtest, 0f, xtest, -600f)
                 xtest += xchange
             }
+        }
 
-            if (gameOver) {
-                gameOver()
-            } else {
-                fieldRender()
-            }
+        if (gameOver) {
+            gameOver()
+        } else {
+            fieldRender()
         }
 
         if (playerMakeMove && delay > 0f)
