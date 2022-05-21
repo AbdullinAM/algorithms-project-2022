@@ -3,6 +3,10 @@ package ru.spbstu.klss.hex.model
 class Model {
 
     val board: MutableList<Cell>
+    val blueStartBase = Cell(5, -1)
+    val blueEndBase = Cell(5, 11)
+    val redStartBase = Cell(-1, 5)
+    val redEndBase = Cell(11, 5)
 
     init {
         this.board = mutableListOf<Cell>()
@@ -12,8 +16,16 @@ class Model {
                 if (x > 0) getCell(x, y).connectWith(getCell(x - 1, y))
                 if (y > 0) getCell(x, y).connectWith(getCell(x, y - 1))
                 if (x > 0 && y > 0) getCell(x, y).connectWith(getCell(x - 1, y - 1))
+                if (x == 0) getCell(x, y).connectWith(redStartBase)
+                if (x == 10) getCell(x, y).connectWith(redEndBase)
+                if (y == 0) getCell(x, y).connectWith(blueStartBase)
+                if (y == 10) getCell(x, y).connectWith(blueEndBase)
             }
         }
+        blueEndBase.color = Color.BLUE
+        blueStartBase.color = Color.BLUE
+        redEndBase.color = Color.RED
+        redStartBase.color = Color.RED
     }
 
     override fun toString(): String {

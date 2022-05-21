@@ -324,4 +324,15 @@ class AlexSolverTest {
 
         assertEquals(10, alexSolver.countMaxLength(model1.board, Color.RED))
     }
+
+    @Test
+    fun findMinPathTest(){
+        val solver = AlexSolver(Color.RED)
+
+        val emptyModel = Model()
+
+        assertEquals(11, solver.findMinPath(emptyModel.blueStartBase, emptyModel.blueEndBase, Color.BLUE))
+        assertEquals(11, solver.findMinPath(emptyModel.redStartBase, emptyModel.redEndBase, Color.RED))
+
+    }
 }

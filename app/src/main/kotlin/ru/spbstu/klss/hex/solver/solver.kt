@@ -1,9 +1,9 @@
 package ru.spbstu.klss.hex.solver
 
-import ru.spbstu.klss.hex.model.Cell
+import ru.spbstu.klss.hex.model.Model
 
 interface Solver {
 
-    fun action(board: MutableList<Cell>): Pair<Int, Int> // returns X and Y
+    fun action(model: Model): Pair<Int, Int> // returns X and Y
 
 }

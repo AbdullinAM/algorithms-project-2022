@@ -11,18 +11,11 @@ class AlexSolver(color: Color) : Solver{
 
     val selfColor = color
     val enemyColor = if (selfColor == Color.RED) Color.BLUE else Color.RED
-    val limitDepth = 3
+    val limitDepth = 2
 
-    val bridgeScore = 2
-    val savedBridgeScore = 4
-    val sizeMultiplier = 10
-    val cellCountMultiplier = 1
-    val attackedBridgeScore = -6
-    val blockedEnemyBridgeScore = 4
-
-    override fun action(board: MutableList<Cell>): Pair<Int, Int> { // returns X and Y
-        if (getCells(board, selfColor).size == 0) {
-            if (board[5 * 11 + 5].color == Color.GRAY)
+    override fun action(model: Model): Pair<Int, Int> { // returns X and Y
+        if (getCells(model.board, selfColor).size == 0) {
+            if (model.getCell(5, 5).color == Color.GRAY)
                 return Pair(5, 5)
             else
                 return Pair(4, 5)
@@ -31,9 +24,10 @@ class AlexSolver(color: Color) : Solver{
         var maxScore = Int.MIN_VALUE
         var result_x = -1
         var result_y = -1
-        for (element in getCells(board, Color.GRAY)) {
+        for (element in getCells(model.board, Color.GRAY)) {
+            println("Проверяем ход: ${element.x}, ${element.y}")
             element.color = selfColor
-            val stepScore = alphaBeta(board, 1, Int.MIN_VALUE, Int.MAX_VALUE)
+            val stepScore = alphaBeta(model, 1, Int.MIN_VALUE, Int.MAX_VALUE)
             if (stepScore > maxScore) {
                 maxScore = stepScore
                 result_x = element.x
@@ -41,17 +35,16 @@ class AlexSolver(color: Color) : Solver{
             }
             element.reset()
         }
+        println("Ход: $result_x, $result_y")
         return Pair(result_x, result_y)
     }
 
-    fun minimax(board: MutableList<Cell>, depth: Int): Int {
-        val scoreList = mutableListOf<Int>()
+    fun minimax(model: Model, depth: Int): Int {
         var result = if (depth % 2 == 1) Int.MAX_VALUE else Int.MIN_VALUE
-        if (depth == limitDepth) return countScore(board)
-        for (element in getCells(board, Color.GRAY)) {
+        if (depth == limitDepth) return countScore(model)
+        for (element in getCells(model.board, Color.GRAY)) {
             element.color = if (depth % 2 == 1) enemyColor else selfColor
-            val score = minimax(board, depth + 1)
-            scoreList.add(score)
+            val score = minimax(model, depth + 1)
             element.reset()
             if (depth % 2 == 1) {
                 result = min(result, score)
@@ -60,23 +53,21 @@ class AlexSolver(color: Color) : Solver{
                 result = max(result, score)
             }
         }
-        //return if (depth % 2 == 1) scoreList.minOrNull() ?: -1000 else scoreList.maxOrNull() ?: 1000
         return result
     }
 
-    fun alphaBeta(board: MutableList<Cell>, depth: Int, alpha: Int, beta: Int): Int {
+    fun alphaBeta(model: Model, depth: Int, alpha: Int, beta: Int): Int {
         var result = if (depth % 2 == 1) Int.MAX_VALUE else Int.MIN_VALUE
         var beta = beta
         var alpha = alpha
-        if (depth == limitDepth) return countScore(board)
-        for (element in getCells(board, Color.GRAY)) {
+        if (depth == limitDepth) return countScore(model)
+        for (element in getCells(model.board, Color.GRAY)) {
             element.color = if (depth % 2 == 1) enemyColor else selfColor
-            val score = alphaBeta(board, depth + 1, alpha, beta)
+            val score = alphaBeta(model, depth + 1, alpha, beta)
             element.reset()
             if (depth % 2 == 1) {
                 result = min(result, score)
                 beta = min(beta, score)
-
             } else {
                 result = max(result, score)
                 alpha = max(alpha, score)
@@ -88,16 +79,19 @@ class AlexSolver(color: Color) : Solver{
         return result
     }
 
-    fun countScore(board: MutableList<Cell>): Int {
+    fun countScore(model: Model): Int {
         var score = 0
-        score += (countBridges(board, selfColor) - countBridges(board, enemyColor)) * bridgeScore
-        score += countMaxLength(board, selfColor) - countMaxLength(board, enemyColor) * sizeMultiplier
-        score += (countAttackedBridges(board, selfColor) - countAttackedBridges(board, enemyColor)) * attackedBridgeScore
-        score += (countSavedBridges(board, selfColor) - countSavedBridges(board, enemyColor)) * savedBridgeScore
-        score += (countEnemyBlockedBridges(board, selfColor) - countEnemyBlockedBridges(board, enemyColor)) * blockedEnemyBridgeScore
-        score += (getCells(board, selfColor).size - getCells(board, enemyColor).size) * cellCountMultiplier
-        if (countMaxLength(board, selfColor) == 11) score += 1000
-        else if (countMaxLength(board, enemyColor) == 11) score -= 1000
+        val redCoefficient: Int
+        val blueCoefficient: Int
+        if (selfColor == Color.RED) {
+            redCoefficient = 1
+            blueCoefficient = -1
+        } else {
+            redCoefficient = -1
+            blueCoefficient = 1
+        }
+        score += redCoefficient * (11 - findMinPath(model.redStartBase, model.redEndBase, Color.RED))
+        score += blueCoefficient * (11 - findMinPath(model.blueStartBase, model.blueEndBase, Color.BLUE))
         return score
     }
 
@@ -196,10 +190,9 @@ class AlexSolver(color: Color) : Solver{
         return bridgeCount
     }
 
-    fun countEnemyBlockedBridges(board: MutableList<Cell>, currentColor: Color): Int {
+    fun countBlockedBridges(board: MutableList<Cell>, currentColor: Color): Int {
         var bridgeCount = 0
-        val oppositeColor = if (currentColor == Color.RED) Color.BLUE else Color.RED
-        val currentCellList = getCells(board, oppositeColor)
+        val currentCellList = getCells(board, currentColor)
 
         for (i in 0 until currentCellList.size) {
             for (j in i + 1 until currentCellList.size) {
@@ -308,5 +301,70 @@ class AlexSolver(color: Color) : Solver{
             if (cell.color == color) result.add(cell)
         }
         return result
+    }
+
+    fun findMinPath(startCell: Cell, endCell: Cell, color: Color): Int {
+        fun index(x: Int, y: Int) = (y + 1) * 13 + x + 1
+        val oppositeColor = if (color == Color.RED) Color.BLUE else Color.RED
+        val matrix = Array(13 * 13) { Int.MAX_VALUE }
+        val visited = mutableListOf<Cell>()
+        var currentCell: Cell
+        var currentIterator: Iterator<Cell>
+        val stack = ArrayDeque<Cell>()
+
+        matrix[index(startCell.x, startCell.y)] = 0
+        stack.addLast(startCell)
+
+        while (stack.isNotEmpty()) {
+            currentCell = stack.last()
+            currentIterator = currentCell.neighbours.iterator()
+            var minPathWay = Int.MAX_VALUE
+            var nextCell: Cell? = null
+
+            while (currentIterator.hasNext()) {
+                var weight = 1
+                val checkedCell = currentIterator.next()
+                if (checkedCell in visited) continue
+                if (checkedCell.color == oppositeColor) continue
+                else if (checkedCell.color == color) {
+                    weight = 0
+                }
+                val currentCellPathWay = matrix[index(currentCell.x, currentCell.y)]
+                val checkedCellPathWay = matrix[index(checkedCell.x, checkedCell.y)]
+                matrix[index(checkedCell.x, checkedCell.y)] = min(currentCellPathWay + weight, checkedCellPathWay)
+                if (matrix[index(checkedCell.x, checkedCell.y)] < minPathWay) {
+                    nextCell = checkedCell
+                    minPathWay = matrix[index(checkedCell.x, checkedCell.y)]
+                }
+
+            }
+            visited.add(currentCell)
+            if (nextCell != null) {
+                stack.addLast(nextCell)
+            } else {
+                stack.removeLast()
+            }
+            var resultString = ""
+            for (y in 0..12) {
+                var row = ""
+                for (x in 0..12) {
+                    val number = matrix[y * 13 + x]
+                    when {
+                        y == startCell.y + 1 && x == startCell.x + 1 -> row += "$number  "
+                        y == endCell.y + 1 && x == endCell.x + 1 -> row += "$number "
+                        y == 0 || y == 12 -> row += "*  "
+                        x == 0 || x == 12 -> row += "*  "
+                        number == Int.MAX_VALUE -> row += "-  "
+                        number < 10 -> row += "$number  "
+                        else -> row += "$number "
+                    }
+                }
+                row += "\n"
+                resultString += row
+            }
+            //println(resultString)
+        }
+
+        return matrix[index(endCell.x, endCell.y)]
     }
 }

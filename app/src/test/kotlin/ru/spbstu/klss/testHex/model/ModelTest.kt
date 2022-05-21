@@ -3,6 +3,7 @@ package ru.spbstu.klss.testHex.model
 import ru.spbstu.klss.hex.model.Color
 import org.junit.Test
 import ru.spbstu.klss.hex.model.Model
+import ru.spbstu.klss.hex.solver.AlexSolver
 import java.util.Random
 import kotlin.test.*
 

@@ -87,7 +87,7 @@ class GameScreen(
         else {
             if (turnQueue[currentPlayer] == "solverFirst") {
                 if (solverFirst != null)
-                    coordinatesToReDraw = solverFirst.action(model.board.toMutableList())
+                    coordinatesToReDraw = solverFirst.action(model)
                 makeMove()
                 delay = delayConst
                 playerMakeMove = !human
@@ -99,7 +99,7 @@ class GameScreen(
         else {
             if (turnQueue[currentPlayer] == "solverSecond") {
                 if (solverSecond != null)
-                    coordinatesToReDraw = solverSecond.action(model.board.toMutableList())
+                    coordinatesToReDraw = solverSecond.action(model)
                 makeMove()
                 delay = delayConst
                 playerMakeMove = !human
