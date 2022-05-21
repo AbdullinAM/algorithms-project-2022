@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils.cos
 import com.badlogic.gdx.math.MathUtils.sin
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ru.spbstu.klss.hex.controller.Hex
 import ru.spbstu.klss.hex.model.Color.*
@@ -17,6 +18,7 @@ import ru.spbstu.klss.hex.model.Model
 import ru.spbstu.klss.hex.solver.Solver
 import java.lang.Math.PI
 import kotlin.math.sqrt
+import com.badlogic.gdx.math.Vector as Vector
 import ru.spbstu.klss.hex.model.Color as ModelColor
 
 class GameScreen(
@@ -26,6 +28,7 @@ class GameScreen(
     val human: Boolean = false
 ) : Screen {
 
+    private val debug: Boolean = false
     private lateinit var viewport: FitViewport
     private lateinit var camera: OrthographicCamera
     private lateinit var linedShapeRenderer: ShapeRenderer
@@ -42,6 +45,7 @@ class GameScreen(
     private var playerMakeMove = !human
 
     private var coordinatesToReDraw = Pair(-1, 1)
+    private var cellToSelect = Pair(-1, -1)
     private val size = 30f
     private val centerX = 300f
     private val centerY = -100f
@@ -73,6 +77,14 @@ class GameScreen(
 
         linedShapeRenderer.begin(ShapeRenderer.ShapeType.Line)
         filledShapeRenderer.begin(ShapeRenderer.ShapeType.Filled)
+        var xtest = 36f
+        val xchange = 26.5f
+        if (debug){
+            for (i in 1..22) {
+                linedShapeRenderer.line(xtest, 0f, xtest, -600f)
+                xtest += xchange
+            }
+        }
 
         if (gameOver) {
             gameOver()
@@ -80,14 +92,15 @@ class GameScreen(
             fieldRender()
         }
 
-        //println("curPlayer = ${currentPlayer} ; name = ${turnQueue[currentPlayer]}")
-        //println("bot1 = $solverFirst ; bot2 = $solverSecond")
         if (playerMakeMove && delay > 0f)
             delay -= delta
         else {
             if (turnQueue[currentPlayer] == "solverFirst") {
-                if (solverFirst != null)
-                    coordinatesToReDraw = solverFirst.action(model)
+                if (solverFirst != null) {
+//                    println("Alex start thinking")
+                    coordinatesToReDraw = solverFirst.action(model.board.toMutableList())
+//                    println("Alex stop thinking Coordinates : $coordinatesToReDraw")
+                }
                 makeMove()
                 delay = delayConst
                 playerMakeMove = !human
@@ -99,7 +112,7 @@ class GameScreen(
         else {
             if (turnQueue[currentPlayer] == "solverSecond") {
                 if (solverSecond != null)
-                    coordinatesToReDraw = solverSecond.action(model)
+                    coordinatesToReDraw = solverSecond.action(model.board.toMutableList())
                 makeMove()
                 delay = delayConst
                 playerMakeMove = !human
@@ -162,17 +175,37 @@ class GameScreen(
                 }
                 return true
             }
+
+            override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
+                val pair = fromPixelsToInts(screenX.toFloat(), screenY.toFloat())
+                this@GameScreen.cellToSelect = pair
+//                println("dragged: $pair")
+                return true
+            }
         }
 
         for (y in 0..10) {
             for (x in 0..10) {
                 linedShapeRenderer.color = Color.WHITE
                 val vertices = fillHexPattern(
-                    centerX + x * (1.75f * size) - y * (1.75f * size) / 2,
-                    centerY + -y * (1.75f * size) * sqrt(3f) / 2,
+                    centerX + x * (1.75f * size) - y * (1.75f * size) / 2.0f,
+                    centerY + -y * (1.75f * size) * sqrt(3f) / 2.0f,
                 )
                 val color = model.getCell(x, y).color
                 fillHexWithColor(vertices, fromModelToViewColor(color))
+                if (x == cellToSelect.first && y == cellToSelect.second) {
+                    filledShapeRenderer.color = Color.YELLOW
+                    for (i in 0..5) {
+                        filledShapeRenderer.rectLine(
+                            vertices[2 * i],
+                            vertices[2 * i + 1],
+                            vertices[(2 * i + 2) % 12],
+                            vertices[(2 * i + 3) % 12],
+                            3f
+                        )
+                    }
+                }
+
                 linedShapeRenderer.polygon(vertices)
                 if (y == 0) {
                     filledShapeRenderer.color = Color.BLUE
@@ -293,11 +326,12 @@ class GameScreen(
 
     private fun fromPixelsToInts(screenX: Float, screenY: Float): Pair<Int, Int> {
         println("screenX: $screenX , ScreenY: $screenY")
-        val padX = centerX - 5.5 * sqrt(3f) * size
-        val sectorHeight = 3.0 / 2.0 * size
-        val sectorWidth = sqrt(3f) * size
+        val sectorHeight = 3.0 / 2.0 * size + 1f
+        val sectorWidth = sqrt(3f) * size + 1f
+        val padX = centerX - 5.5 * sectorWidth
         val pixY = screenY + centerY + sectorHeight / 2.0
         var pixX = screenX - padX
+        if (pixX < 0 || pixY < 0) return Pair(-1, 1)
         //ориентировочные координаты клетки в массиве
         var cellY = (pixY / sectorHeight.toInt()).toInt()
         pixX -= (sectorWidth / 2.0) * (10 - cellY)
@@ -321,7 +355,7 @@ class GameScreen(
         if (deltaX > 3.0 / 4.0 * sectorWidth) {
             // правый угол
             pixWidth = deltaX - 3.0 / 4.0 * sectorWidth
-            if (deltaY < sectorHeight / 2.0) {
+            if (deltaY < sectorHeight * 3.0f / 4.0f) {
                 //верних угол
                 pixHeight = deltaY
                 if (pixHeight / pixWidth < tan) {
@@ -337,10 +371,10 @@ class GameScreen(
                     println("right-down : X: $cellX , Y: $cellY")
                 }
             }
-        } else if (deltaX < sectorWidth / 4.0) {
+        } else if (deltaX < sectorWidth / 4.0f) {
             //левый угол
             pixWidth = deltaX
-            if (deltaY < sectorHeight / 2.0) {
+            if (deltaY < sectorHeight * 3.0 / 4.0) {
                 //верних угол
                 pixHeight = deltaY
                 if (pixHeight / pixWidth < tan) {
