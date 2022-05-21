@@ -1,14 +1,23 @@
 package treap;
 
+import jakarta.xml.bind.annotation.XmlType;
 import javafx.util.Pair;
+
+import jakarta.xml.bind.annotation.XmlRootElement;
+import com.sun.xml.txw2.annotation.XmlAttribute;
+import com.sun.xml.txw2.annotation.XmlElement;
 
 import java.util.Random;
 
+@XmlRootElement(name = "Treap")
 public class Treap<T extends Comparable<T>> {
     public static class Node<T> {
         public T x;
         public int y;
         public Node<T> left, right;
+
+        public Node() {
+        }
 
         Node(T x) {
             this.x = x;
@@ -19,6 +28,10 @@ public class Treap<T extends Comparable<T>> {
 
 
     public Node<T> root;
+
+    public Node<T> setRoot() {
+        return root;
+    }
 
     private Pair split(Node<T> node, T x) {
         if (node == null)

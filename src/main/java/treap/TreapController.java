@@ -1,11 +1,15 @@
 package treap;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Unmarshaller;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
+import javax.xml.bind.JAXBException;
+import java.io.File;
 import java.util.Optional;
 
 public class TreapController {
@@ -33,12 +37,29 @@ public class TreapController {
             alert.setTitle("Элемент не найден");
             alert.setHeaderText("Удаляемого элемента не существует");
             alert.setGraphic(failView);
-            Optional<ButtonType> result = alert.showAndWait();
+            alert.showAndWait();
         } else if (n == TreapGUI.treap.root && n.left == null && n.right == null) {
             TreapGUI.empty = true;
             TreapGUI.treap = null;
         } else
             TreapGUI.treap.remove(TreapGUI.treap.root, (Comparable) toFind);
+        TreapGUI.drawTreap();
+    }
+
+    @FXML
+    private void load() throws jakarta.xml.bind.JAXBException, ClassNotFoundException {
+        JAXBContext context = JAXBContext.newInstance(Treap.class);
+        Unmarshaller um = context.createUnmarshaller();
+        File file = new File("src/main/resources/save.xml");
+        TreapGUI.treap = (Treap) um.unmarshal(file);
+        if (TreapGUI.treap.root.x == null)
+            return;
+        TreapGUI.empty = false;
+        TreapGUI.SetPane(mainpane);
+        if (TreapGUI.treap.root.x.getClass() == Class.forName("java.lang.Double"))
+            TreapGUI.type = TreapGUI.type.DOUBLE;
+        else
+            TreapGUI.type = TreapGUI.type.STRING;
         TreapGUI.drawTreap();
     }
 
@@ -70,7 +91,16 @@ public class TreapController {
         }
         TreapGUI.type type = TreapGUI.type;
         if (type == TreapGUI.type.DOUBLE) {
-            TreapGUI.treap.add(Double.parseDouble(text));
+            try {
+                TreapGUI.treap.add(Double.parseDouble(text));
+            } catch (NumberFormatException e) {
+                ImageView failView = new ImageView("/11.png");
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Некорректный элемент");
+                alert.setHeaderText("Видимо, вы попытались загрузить строку в дерево чисел");
+                alert.setGraphic(failView);
+                alert.showAndWait();
+            }
         } else {
             TreapGUI.treap.add(text);
         }

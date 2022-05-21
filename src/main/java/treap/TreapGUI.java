@@ -1,5 +1,9 @@
 package treap;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -19,6 +23,7 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -29,6 +34,7 @@ public class TreapGUI extends Application {
     public static type type;
     public static int size = 0;
     public static AnchorPane pane;
+
     public enum type {
         STRING,
         DOUBLE
@@ -39,7 +45,7 @@ public class TreapGUI extends Application {
     }
 
     @Override
-    public void start(Stage stage) throws IOException {
+    public void start(Stage stage) throws IOException, JAXBException, javax.xml.bind.JAXBException, ClassNotFoundException {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(TreapGUI.class.getResource("/TreapMain.fxml"));
         Parent root = loader.load();
@@ -51,14 +57,22 @@ public class TreapGUI extends Application {
         stage.setTitle("Treap viewer");
         stage.getIcons().add(new javafx.scene.image.Image("/peace_symbol_PNG92.png"));
         stage.show();
+        stage.setOnCloseRequest(we -> {
+            try {
+                save();
+            } catch (JAXBException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public static void main(String[] args) {
         launch(args);
     }
 
+
     public static void SetPane(AnchorPane anchorPane) {
-        pane=anchorPane;
+        pane = anchorPane;
     }
 
     public static DoubleProperty drawCircle(double x, double y, Object dataX, Integer dataY, @Nullable DoubleProperty property) {
@@ -72,7 +86,7 @@ public class TreapGUI extends Application {
         text.setFont(Font.font(14));
         priority.setFont(Font.font(14));
         circle.setStrokeWidth(2);
-        Color color =  Color.web("cc9d1d");
+        Color color = Color.web("cc9d1d");
         circle.setStroke(color);
         priority.setText("Y=" + dataY);
         text.setText(dataX.toString());
@@ -153,7 +167,7 @@ public class TreapGUI extends Application {
             }
             if (right != null && left != null && Math.abs(left.doubleValue() - right.doubleValue()) < 85) {
                 System.out.println(Math.abs(left.doubleValue() - right.doubleValue()));
-                size = level+2;
+                size = level + 2;
                 drawTreap();
                 return;
             }
@@ -164,7 +178,7 @@ public class TreapGUI extends Application {
             }
             if (right != null && left != null && Math.abs(right.doubleValue() - left.doubleValue()) < 85) {
                 System.out.println(Math.abs(right.doubleValue() - left.doubleValue()));
-                size = level+2;
+                size = level + 2;
                 drawTreap();
                 return;
             }
@@ -174,8 +188,8 @@ public class TreapGUI extends Application {
         else {
             System.out.println(size);
             System.out.println(level);
-            if (level-2 <= size) {
-                size = level-2;
+            if (level - 2 <= size) {
+                size = level - 2;
             }
         }
     }
@@ -183,7 +197,7 @@ public class TreapGUI extends Application {
     public static void drawTreap() {
         System.out.println("размер дерева" + size);
         if (size > 3) {
-            pane.setPrefSize(85 * Math.pow(2, size-2), 40 + 100 * (size));
+            pane.setPrefSize(85 * Math.pow(2, size - 2), 40 + 100 * (size));
         } else
             pane.setPrefSize(810, 500);
         pane.getChildren().clear();
@@ -194,4 +208,13 @@ public class TreapGUI extends Application {
         array.add(pair);
         ScanLevels(array, 1);
     }
+
+    public void save() throws JAXBException {
+        if (treap == null) return;
+        JAXBContext context = JAXBContext.newInstance(Treap.class);
+        Marshaller m = context.createMarshaller();
+        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        m.marshal(treap, new File("src/main/resources/save.xml"));
+    }
+
 }

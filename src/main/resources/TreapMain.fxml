@@ -20,12 +20,12 @@
       <HBox maxHeight="40.0" minHeight="40.0" minWidth="810.0" prefHeight="40.0" prefWidth="810.0" style="-fx-background-color: black;" VBox.vgrow="ALWAYS">
          <children>
             <ButtonBar minWidth="90.0" nodeOrientation="RIGHT_TO_LEFT" prefHeight="50.0" prefWidth="90.0">
-              <buttons>
-                <Button mnemonicParsing="false" onAction="#clear" style="-fx-background-color: #cc9d1d;" text="Очистить">
+               <buttons>
+                  <Button mnemonicParsing="false" onAction="#clear" style="-fx-background-color: #cc9d1d;" text="Очистить">
                      <font>
                         <Font size="14.0" />
                      </font></Button>
-              </buttons>
+               </buttons>
                <HBox.margin>
                   <Insets left="5.0" />
                </HBox.margin>
@@ -38,7 +38,7 @@
                   <Font size="14.0" />
                </font>
             </TextField>
-            <ButtonBar minWidth="205.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="50.0" prefWidth="205.0" HBox.hgrow="ALWAYS">
+            <ButtonBar minWidth="315.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="50.0" prefWidth="315.0" HBox.hgrow="ALWAYS">
                <buttons>
                   <Button mnemonicParsing="false" onAction="#add" prefHeight="30.0" prefWidth="90.0" style="-fx-background-color: #83e546;" text="Добавить">
                      <font>
@@ -48,6 +48,11 @@
                      <font>
                         <Font size="14.0" />
                      </font></Button>
+                  <Button mnemonicParsing="false" onAction="#load" style="-fx-background-color: white;" text="Загрузить">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Button>
                </buttons>
                <HBox.margin>
                   <Insets right="5.0" />
