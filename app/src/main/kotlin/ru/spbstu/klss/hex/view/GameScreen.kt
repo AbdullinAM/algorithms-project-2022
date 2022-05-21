@@ -6,11 +6,14 @@ import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils.cos
 import com.badlogic.gdx.math.MathUtils.sin
-import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ru.spbstu.klss.hex.controller.Hex
 import ru.spbstu.klss.hex.model.Color.*
@@ -18,8 +21,8 @@ import ru.spbstu.klss.hex.model.Model
 import ru.spbstu.klss.hex.solver.Solver
 import java.lang.Math.PI
 import kotlin.math.sqrt
-import com.badlogic.gdx.math.Vector as Vector
 import ru.spbstu.klss.hex.model.Color as ModelColor
+
 
 class GameScreen(
     val game: Hex,
@@ -51,6 +54,9 @@ class GameScreen(
     private val centerY = -100f
     private var gameOver = false
 
+    private lateinit var mainFont: BitmapFont
+    private lateinit var subFont: BitmapFont
+
     override fun show() {
         batch = SpriteBatch()
         linedShapeRenderer = ShapeRenderer()
@@ -66,6 +72,8 @@ class GameScreen(
         if (solverFirst != null) turnQueue.add("solverFirst")
         if (solverSecond != null) turnQueue.add("solverSecond")
         if (turnQueue.size == currentPlayer) currentPlayer--
+
+        createFont()
     }
 
     override fun render(delta: Float) {
@@ -75,11 +83,33 @@ class GameScreen(
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
         Gdx.gl.glClearColor(1f, 1f, 1f, 1f)
 
+        val textColor = if (currentColor == Color.RED) "Red"
+        else "Blue"
+
+        var textPlayer = ""
+        if (turnQueue.size == 1) {
+            if (textColor == "Red") textPlayer ="firstHuman"
+            else textPlayer = "secondHuman"
+        } else {
+            if (turnQueue[currentPlayer] == "human") textPlayer = "human"
+            else {
+                if (solverFirst != null) textPlayer = solverFirst.toString()
+                if (solverSecond != null) textPlayer = solverSecond.toString()
+            }
+        }
+
+        val string = "Turn: " + textPlayer + System.getProperty("line.separator") + "" +
+                "turnColor: $textColor"
+
+        batch.begin();
+        mainFont.draw(batch, string, 600f, -550f);
+        batch.end();
+
         linedShapeRenderer.begin(ShapeRenderer.ShapeType.Line)
         filledShapeRenderer.begin(ShapeRenderer.ShapeType.Filled)
         var xtest = 36f
         val xchange = 26.5f
-        if (debug){
+        if (debug) {
             for (i in 1..22) {
                 linedShapeRenderer.line(xtest, 0f, xtest, -600f)
                 xtest += xchange
@@ -159,6 +189,13 @@ class GameScreen(
         if (modelColor == RED) return Color.RED
         if (modelColor == BLUE) return Color.BLUE
         return Color.LIGHT_GRAY
+    }
+
+    private fun createFont() {
+        mainFont = BitmapFont()
+        mainFont.setColor(Color.BLACK)
+        mainFont.setUseIntegerPositions(false)
+        mainFont.getData().setScale(2.5f)
     }
 
 

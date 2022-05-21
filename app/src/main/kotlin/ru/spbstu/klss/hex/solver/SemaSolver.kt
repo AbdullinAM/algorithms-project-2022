@@ -11,16 +11,16 @@ class SemaSolver(color: Color) : Solver {
 
     private val selfColor = color
     private val enemyColor = if (selfColor == Color.RED) Color.BLUE else Color.RED
-    private val limitDepth = 3
+    private val limitDepth = 2
 
     //koef
     private val connectCountMultiplayer = 5
     private val diagonalCountMultiplayer = 10
-    private val savedDiagonalMultiplayer = 4
+    private val savedDiagonalMultiplayer = 6
     private val sizeMultiplier = 10
     private val cellCountMultiplier = 1
-    private val attackedDiagonalMultiplayer = -6
-    private val blockedEnemyDiagonalMultiplayer = 4
+    private val attackedDiagonalMultiplayer = -8
+    private val blockedEnemyDiagonalMultiplayer = 7
 
 
     override fun action(model: Model): Pair<Int, Int> { // returns X and Y
@@ -173,10 +173,10 @@ class SemaSolver(color: Color) : Solver {
         if (countMaxLength(board, selfColor) == 11) score += 1000
         else if (countMaxLength(board, enemyColor) == 11) score -= 1000
 
-        val redCoefficient = if (selfColor == Color.RED) 1 else -1
-        val blueCoefficient = redCoefficient * -1
-        score += redCoefficient * (11 - djhxtra(model.redStartBase, model.redEndBase, Color.RED))
-        score += blueCoefficient * (11 - djhxtra(model.blueStartBase, model.blueEndBase, Color.BLUE))
+//        val redCoefficient = if (selfColor == Color.RED) 1 else -1
+//        val blueCoefficient = redCoefficient * -1
+//        score += redCoefficient * (11 - djhxtra(model.redStartBase, model.redEndBase, Color.RED))
+//        score += blueCoefficient * (11 - djhxtra(model.blueStartBase, model.blueEndBase, Color.BLUE))
         return score
     }
 
@@ -197,7 +197,7 @@ class SemaSolver(color: Color) : Solver {
         return result
     }
 
-    private fun diagonalsCount(board: MutableList<Cell>): Int {
+    fun diagonalsCount(board: MutableList<Cell>): Int {
         var result = 0
         for (y in 0..10) {
             for (x in 0..10) {
@@ -224,7 +224,7 @@ class SemaSolver(color: Color) : Solver {
         return result
     }
 
-    private fun isDiagonal(cell1: Cell, cell2: Cell): Boolean {
+    fun isDiagonal(cell1: Cell, cell2: Cell): Boolean {
         if (cell1.color != cell2.color) return false
         var ways = 0
         for (neighbour in cell1.neighbours) {
@@ -234,7 +234,7 @@ class SemaSolver(color: Color) : Solver {
     }
 
 
-    private fun countMaxLength(board: MutableList<Cell>, currentColor: Color): Int {
+    fun countMaxLength(board: MutableList<Cell>, currentColor: Color): Int {
         val currentCellList = getCells(board, currentColor)
         var minCord: Int
         var maxCord: Int
@@ -280,7 +280,7 @@ class SemaSolver(color: Color) : Solver {
         return maxLength
     }
 
-    private fun countSavedDiagonals(board: MutableList<Cell>, currentColor: Color): Int {
+    fun countSavedDiagonals(board: MutableList<Cell>, currentColor: Color): Int {
         var diagonalCount = 0
         val currentCellList = getCells(board, currentColor)
 
@@ -329,7 +329,7 @@ class SemaSolver(color: Color) : Solver {
         return diagonalCount
     }
     
-    private fun isBlockedDiagonal(cell1: Cell, cell2: Cell, board: MutableList<Cell>): Boolean {
+    fun isBlockedDiagonal(cell1: Cell, cell2: Cell, board: MutableList<Cell>): Boolean {
         if (!isDiagonal(cell1, cell2)) return false
         val deltaX = cell1.x - cell2.x
         val deltaY = cell1.y - cell2.y
@@ -380,7 +380,7 @@ class SemaSolver(color: Color) : Solver {
 
     }
 
-    private fun isSavedDiagonal(cell1: Cell, cell2: Cell, board: MutableList<Cell>): Boolean {
+    fun isSavedDiagonal(cell1: Cell, cell2: Cell, board: MutableList<Cell>): Boolean {
         if (!isDiagonal(cell1, cell2)) return false
         val deltaX = cell1.x - cell2.x
         val deltaY = cell1.y - cell2.y
@@ -405,7 +405,7 @@ class SemaSolver(color: Color) : Solver {
 
     private fun countIndex(x: Int, y: Int) = y * 11 + x
 
-    private fun getCells(board: MutableList<Cell>, color: Color): MutableList<Cell> {
+    fun getCells(board: MutableList<Cell>, color: Color): MutableList<Cell> {
         val result = mutableListOf<Cell>()
         for (cell in board) {
             if (cell.color == color) result.add(cell)
