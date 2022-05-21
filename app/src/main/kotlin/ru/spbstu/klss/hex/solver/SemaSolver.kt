@@ -173,10 +173,10 @@ class SemaSolver(color: Color) : Solver {
         if (countMaxLength(board, selfColor) == 11) score += 1000
         else if (countMaxLength(board, enemyColor) == 11) score -= 1000
 
-//        val redCoefficient = if (selfColor == Color.RED) 1 else -1
-//        val blueCoefficient = redCoefficient * -1
-//        score += redCoefficient * (11 - djhxtra(model.redStartBase, model.redEndBase, Color.RED))
-//        score += blueCoefficient * (11 - djhxtra(model.blueStartBase, model.blueEndBase, Color.BLUE))
+        val redCoefficient = if (selfColor == Color.RED) 1 else -1
+        val blueCoefficient = redCoefficient * -1
+        score += redCoefficient * (11 - djhxtra(model.redStartBase, model.redEndBase, Color.RED))
+        score += blueCoefficient * (11 - djhxtra(model.blueStartBase, model.blueEndBase, Color.BLUE))
         return score
     }
 
@@ -225,7 +225,6 @@ class SemaSolver(color: Color) : Solver {
     }
 
     fun isDiagonal(cell1: Cell, cell2: Cell): Boolean {
-        if (cell1.color != cell2.color) return false
         var ways = 0
         for (neighbour in cell1.neighbours) {
             if (neighbour.color == Color.GRAY && cell2 in neighbour.neighbours) ways++

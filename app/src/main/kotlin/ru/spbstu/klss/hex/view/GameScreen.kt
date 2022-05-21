@@ -127,9 +127,7 @@ class GameScreen(
         else {
             if (turnQueue[currentPlayer] == "solverFirst") {
                 if (solverFirst != null) {
-//                    println("Alex start thinking")
                     coordinatesToReDraw = solverFirst.action(model)
-//                    println("Alex stop thinking Coordinates : $coordinatesToReDraw")
                 }
                 makeMove()
                 delay = delayConst

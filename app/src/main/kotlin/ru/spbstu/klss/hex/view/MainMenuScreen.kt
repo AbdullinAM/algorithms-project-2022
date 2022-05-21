@@ -93,7 +93,7 @@ class MainMenuScreen(val game: Hex) : Screen {
         twoSolverButton = ImageButton(twoSolverButtonStyle)
         twoSolverButton.addListener(object : ChangeListener() {
             override fun changed(event: ChangeEvent?, actor: Actor?) {
-                game.screen = GameScreen(game, AlexSolver(Color.BLUE),AlexSolver(Color.RED)/*SemaSolver*/)
+                game.screen = GameScreen(game, AlexSolver(Color.BLUE),SemaSolver(Color.RED))
             }
         }
         )
