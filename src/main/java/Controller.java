@@ -3,6 +3,8 @@ import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -155,6 +157,7 @@ public class Controller {
             winMessage();
     }
 
+    @NotNull
     private String helper() {
         return new Solver().helper();
     }
