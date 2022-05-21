@@ -28,12 +28,12 @@ class AlexSolver(color: Color) : Solver{
                 return Pair(4, 5)
         }
 
-        var maxScore = -1000
+        var maxScore = Int.MIN_VALUE
         var result_x = -1
         var result_y = -1
         for (element in getCells(board, Color.GRAY)) {
             element.color = selfColor
-            val stepScore = alphaBeta(board, 1, -10000, 10000)
+            val stepScore = alphaBeta(board, 1, Int.MIN_VALUE, Int.MAX_VALUE)
             if (stepScore > maxScore) {
                 maxScore = stepScore
                 result_x = element.x
@@ -46,7 +46,7 @@ class AlexSolver(color: Color) : Solver{
 
     fun minimax(board: MutableList<Cell>, depth: Int): Int {
         val scoreList = mutableListOf<Int>()
-        var result = if (depth % 2 == 1) 10000 else -10000
+        var result = if (depth % 2 == 1) Int.MAX_VALUE else Int.MIN_VALUE
         if (depth == limitDepth) return countScore(board)
         for (element in getCells(board, Color.GRAY)) {
             element.color = if (depth % 2 == 1) enemyColor else selfColor
@@ -65,7 +65,7 @@ class AlexSolver(color: Color) : Solver{
     }
 
     fun alphaBeta(board: MutableList<Cell>, depth: Int, alpha: Int, beta: Int): Int {
-        var result = if (depth % 2 == 1) 10000 else -10000
+        var result = if (depth % 2 == 1) Int.MAX_VALUE else Int.MIN_VALUE
         var beta = beta
         var alpha = alpha
         if (depth == limitDepth) return countScore(board)
@@ -133,8 +133,8 @@ class AlexSolver(color: Color) : Solver{
             visited.add(currentCell)
             stack.add(Pair(currentCell, currentIterator))
 
-            minCoord = 11
-            maxCoord = -1
+            minCoord = Int.MAX_VALUE
+            maxCoord = Int.MIN_VALUE
 
             while (stack.isNotEmpty()) {
                 currentCell = stack.last().first
