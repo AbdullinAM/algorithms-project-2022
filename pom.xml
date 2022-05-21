@@ -11,7 +11,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>5.8.2</junit.version>
-        <jvm.version>18</jvm.version>
+        <jvm.version>11</jvm.version>
         <maven.compiler.source>${jvm.version}</maven.compiler.source>
         <maven.compiler.target>${jvm.version}</maven.compiler.target>
     </properties>
