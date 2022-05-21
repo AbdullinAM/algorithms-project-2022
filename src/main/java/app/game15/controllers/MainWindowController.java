@@ -1,11 +1,10 @@
-package controllers;
+package app.game15.controllers;
 
-import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
-import loading.MainWindow;
-import logic.fifteen.State;
-import logic.solver.Solver;
+import app.game15.loading.MainWindow;
+import app.game15.logic.fifteen.State;
+import app.game15.logic.solver.Solver;
 
 import java.util.ArrayList;
 

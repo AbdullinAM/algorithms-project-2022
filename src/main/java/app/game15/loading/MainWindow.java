@@ -1,17 +1,15 @@
-package loading;
+package app.game15.loading;
 
-import controllers.MainWindowController;
+import app.game15.controllers.MainWindowController;
 import javafx.application.Application;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import javafx.scene.layout.*;
-import logic.fifteen.State;
-import logic.solver.Solver;
+import app.game15.logic.fifteen.State;
+import app.game15.logic.solver.Solver;
 
 import java.io.IOException;
 import java.net.URL;

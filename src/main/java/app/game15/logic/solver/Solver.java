@@ -1,15 +1,14 @@
-package logic.solver;
+package app.game15.logic.solver;
 
-import loading.MainWindow;
-import logic.fifteen.State;
+import app.game15.logic.fifteen.State;
 import java.util.*;
 
 public class Solver {
 
-    private final List<State> result = new ArrayList<>();
-    private final State currentState;
+    private final ArrayList<State> result = new ArrayList<>();
+    private State currentState;
 
-    private PriorityQueue<State> priorityQueue = new PriorityQueue<>(20, new Comparator<State>() {
+    private final PriorityQueue<State> priorityQueue = new PriorityQueue<>(100, new Comparator<State>() {
         @Override
         public int compare(State o1, State o2) {
             return Integer.compare(measure(o1), measure(o2));
@@ -25,21 +24,22 @@ public class Solver {
 
         if(!isSolvable(currentState)) return;
 
-        while (true) {
+        while (!currentState.isGoal()) {
 
-            State state2 = priorityQueue.poll();
-            assert state2 != null;
-            MainWindow.initButtons(toArrayList(state2.blocks));
-            if(state2.isGoal()) {
-                stateToList(new State(state2.getBlocks(), state2));
+            currentState = priorityQueue.poll();
+            System.out.println(currentState);
+            if (currentState.isGoal()) {
+                stateToList(currentState);
                 return;
             }
-
-            for (State board1 : state2.neighbors()) {
-                if (board1 != null && !containsInPath(state2, board1)) {
-                    priorityQueue.add(new State(state2.getBlocks(), board1));
+            currentState.setChildren();
+            ArrayList<State> children = currentState.getChildren();
+            for (State board1 : children) {
+                if (board1 != null && !containsInPath(currentState, board1)) {
+                    priorityQueue.add(board1);
                 }
             }
+
         }
     }
 
@@ -60,10 +60,10 @@ public class Solver {
 
     private void stateToList(State currentState){
         State currentState2 = currentState;
+        result.add(currentState2);
         while (true) {
             currentState2 = currentState2.getParent();
             if(currentState2 == null) {
-                Collections.reverse(result);
                 return;
             }
             result.add(currentState2);
@@ -90,11 +90,12 @@ public class Solver {
                     count++;
                 }
                 if (arrList.get(i) == 0) {
-                    index = (i % 4) + 1;
+                    index = (i / 4);
                 }
             }
         }
         return ((count + index) % 2) == 0;
+
     }
 
     private static ArrayList<Integer> toArrayList(int[][] arr) {
@@ -107,7 +108,7 @@ public class Solver {
         return result;
     }
 
-    public Iterable<State> solution() {
+    public ArrayList<State> getResult() {
         return result;
     }
 

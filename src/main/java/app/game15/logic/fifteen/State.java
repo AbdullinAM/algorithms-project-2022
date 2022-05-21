@@ -1,19 +1,18 @@
-package logic.fifteen;
-import java.util.HashSet;
-import java.util.Set;
+package app.game15.logic.fifteen;
+import java.util.ArrayList;
 
 public class State {
 
     public int[][] blocks;
-    private int zeroX;
-    private int zeroY;
+    private int zeroRow;
+    private int zeroColumn;
     private int h;
 
     public State getParent() {
         return parent;
     }
 
-    private State parent;
+    private final State parent;
 
     public int[][] getBlocks(){
         return blocks;
@@ -31,8 +30,8 @@ public class State {
                     h += 1;
                 }
                 if (blocks[i][j] == 0) {
-                    zeroX = i;
-                    zeroY = j;
+                    zeroRow = i;
+                    zeroColumn = j;
                 }
             }
         }
@@ -70,27 +69,34 @@ public class State {
         return true;
     }
 
-    public Iterable<State> neighbors() {
-        Set<State> boardList = new HashSet<>();
-        boardList.add(changes(getNewBlock(), zeroX, zeroY, zeroX, zeroY + 1));
-        boardList.add(changes(getNewBlock(), zeroX, zeroY, zeroX, zeroY - 1));
-        boardList.add(changes(getNewBlock(), zeroX, zeroY, zeroX - 1, zeroY));
-        boardList.add(changes(getNewBlock(), zeroX, zeroY, zeroX + 1, zeroY));
-
-        return boardList;
+    public ArrayList<State> getChildren() {
+        return children;
     }
 
-    private int[][] getNewBlock() {
+    private ArrayList<State> children;
+
+    public void setChildren() {
+        ArrayList<State> boardList = new ArrayList<>();
+        boardList.add(changes(getInitialBlock(), zeroRow, zeroColumn, zeroRow, zeroColumn + 1));
+        boardList.add(changes(getInitialBlock(), zeroRow, zeroColumn, zeroRow, zeroColumn - 1));
+        boardList.add(changes(getInitialBlock(), zeroRow, zeroColumn, zeroRow - 1, zeroColumn));
+        boardList.add(changes(getInitialBlock(), zeroRow, zeroColumn, zeroRow + 1, zeroColumn));
+        children = boardList;
+    }
+
+    private int[][] getInitialBlock() {
         return saveOriginal(blocks);
     }
 
-    private State changes(int[][] blocks2, int x1, int y1, int x2, int y2) {
+    private State changes(int[][] blocks, int zeroX, int zeroY, int neighborX, int neighborY) {
 
-        if (x2 > -1 && x2 < dimension() && y2 > -1 && y2 < dimension()) {
-            int t = blocks2[x2][y2];
-            blocks2[x2][y2] = blocks2[x1][y1];
-            blocks2[x1][y1] = t;
-            return new State(blocks2, null);
+        if (neighborX > -1 && neighborX < dimension() && neighborY > -1 && neighborY < dimension()) {
+            int t = blocks[neighborX][neighborY];
+            blocks[neighborX][neighborY] = blocks[zeroX][zeroY];
+            blocks[zeroX][zeroY] = t;
+            State s = new State(blocks, this);
+            int[][] ts = s.blocks;
+            return s;
         } else
             return null;
 
