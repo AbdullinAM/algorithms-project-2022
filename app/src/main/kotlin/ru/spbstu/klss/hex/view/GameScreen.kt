@@ -6,11 +6,8 @@ import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils.cos
 import com.badlogic.gdx.math.MathUtils.sin
@@ -55,7 +52,6 @@ class GameScreen(
     private var gameOver = false
 
     private lateinit var mainFont: BitmapFont
-    private lateinit var subFont: BitmapFont
 
     override fun show() {
         batch = SpriteBatch()
@@ -89,8 +85,16 @@ class GameScreen(
         var textPlayer2 = ""
         var string = ""
         if (turnQueue.size == 1) {
-            if (textColor == "Red") textPlayer1 ="firstHuman"
-            else textPlayer2 = "secondHuman"
+            if (textColor == "Red") {
+                textPlayer1 = "firstHuman"
+                string = "Turn: " + textPlayer1 + System.getProperty("line.separator") + "" +
+                        "turnColor: $textColor"
+            }
+            else {
+                textPlayer2 = "secondHuman"
+                string = "Turn: " + textPlayer2 + System.getProperty("line.separator") + "" +
+                        "turnColor: $textColor"
+            }
         } else {
             if (turnQueue[currentPlayer] == "human") textPlayer1 = "human"
             else {
