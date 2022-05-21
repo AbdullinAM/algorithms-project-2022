@@ -3,9 +3,7 @@ package treaptest;
 import org.junit.Test;
 import treap.Treap;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Random;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -30,21 +28,22 @@ public class TreapTest {
         for (double i : rand) {
             treap.add(i);
         }
+        assertEquals(1000, treap.size());
         int[] toDelete = new Random().ints(50, 0, 1000).toArray();
         ArrayList<Double> deleted = new ArrayList<>();
         HashSet<Integer> deletedIndexes = new HashSet<>();
         for (int i : toDelete) {
             Double toRemove = rand[i];
             deleted.add(toRemove);
-            treap.remove(treap.root, toRemove);
+            treap.remove(toRemove);
             deletedIndexes.add(i);
         }
         for (double i : deleted) {
-            assertNull(treap.find(i));
+            assertFalse(treap.contains(i));
         }
         for (int i = 0; i < 1000; i++) {
             if (!deletedIndexes.contains(i))
-                assertNotNull(treap.find(rand[i]));
+                assertTrue(treap.contains(rand[i]));
         }
         HashSet<Treap.Node> hashSet = new HashSet<>();
         hashSet.add(treap.root);
@@ -62,14 +61,14 @@ public class TreapTest {
         for (int i = 0; i < 100; i++) {
             double oldRoot = treap.root.x;
             deleted.add(oldRoot);
-            treap.remove(treap.root, treap.root.x);
+            treap.remove(treap.root.x);
             assertNotEquals(treap.root.x, oldRoot);
         }
         for (Double node : rand) {
             if (!deleted.contains(node))
-                assertNotNull(treap.find(node));
+                assertTrue(treap.contains(node));
             else
-                assertNull(treap.find(node));
+                assertFalse(treap.contains(node));
         }
     }
 
@@ -106,5 +105,81 @@ public class TreapTest {
         HashSet<Treap.Node> hashSet = new HashSet<>();
         hashSet.add(treap.root);
         ScanLevels(hashSet);
+    }
+
+    @Test
+    public void iterator() {
+        double[] rand = new Random().doubles(1000, 0, 1000).toArray();
+        Random random = new Random();
+        for (int i = 0; i < 100; i++) {
+            HashSet<Integer> controlSet = new HashSet<>();
+            for (int j = 0; j < 100; j++) {
+                controlSet.add(random.nextInt(100));
+            }
+            Treap<Double> treap = new Treap<>();
+            assertFalse(treap.iterator().hasNext());
+            for (Integer element : controlSet) {
+                treap.add(element);
+            }
+            Iterator iterator1 = treap.iterator();
+            Iterator iterator2 = treap.iterator();
+            while (iterator1.hasNext()) {
+                assertEquals(iterator2.next(), iterator1.next());
+            }
+            Iterator controlIter = controlSet.iterator();
+            Iterator binaryIter = treap.iterator();
+            while (controlIter.hasNext()) {
+                assertEquals(controlIter.next(), binaryIter.next());
+            }
+            boolean test = false;
+            try {
+                binaryIter.next();
+            } catch (NoSuchElementException e) {
+                test = true;
+            }
+            assertTrue(test);
+        }
+    }
+
+    @Test
+    public void other() {
+        Treap<Double> treap = new Treap<>();
+        assertTrue(treap.isEmpty());
+        double[] rand = new Random().doubles(1000, 0, 1000).toArray();
+        ArrayList<Double> array = new ArrayList<>();
+        for (Double element : rand) {
+            array.add(element);
+        }
+        treap.addAll(array);
+        for (Double elements : array) {
+            assertTrue(treap.contains(elements));
+        }
+        Object[] comparison = treap.stream().toArray();
+        for (Object element : comparison) {
+            assertTrue(treap.contains(element));
+        }
+        assertTrue(treap.containsAll(array));
+        assertFalse(treap.isEmpty());
+        treap.removeAll(array);
+        for (Double elements : array) {
+            assertFalse(treap.contains(elements));
+        }
+        assertTrue(treap.isEmpty());
+        assertEquals(0, treap.size());
+        HashSet<Double> hashSet = new HashSet<>();
+        double[] ran = new Random().doubles(100, 0, 1000).toArray();
+        HashSet<Double> toRetain = new HashSet<>();
+        for (Double element : rand) {
+            hashSet.add(element);
+        }
+        for (Double element : ran) {
+            toRetain.add(element);
+        }
+        treap.addAll(hashSet);
+        treap.retainAll(toRetain);
+        hashSet.removeAll(toRetain);
+        for (Double element : hashSet) {
+            assertFalse(treap.contains(element));
+        }
     }
 }

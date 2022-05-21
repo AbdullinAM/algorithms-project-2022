@@ -1,7 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Treap>
     <root>
-        <x xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:double">1.0</x>
-        <y>948</y>
+        <x xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:double">4.0</x>
+        <y>719</y>
+        <left>
+            <x xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:double">1.0</x>
+            <y>672</y>
+            <right>
+                <x xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:double">2.0</x>
+                <y>473</y>
+            </right>
+        </left>
+        <right>
+            <x xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:double">45.0</x>
+            <y>185</y>
+            <left>
+                <x xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:double">5.0</x>
+                <y>19</y>
+            </left>
+        </right>
     </root>
 </Treap>

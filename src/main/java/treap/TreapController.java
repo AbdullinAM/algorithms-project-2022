@@ -46,7 +46,7 @@ public class TreapController {
             TreapGUI.empty = true;
             TreapGUI.treap = null;
         } else
-            TreapGUI.treap.remove(TreapGUI.treap.root, (Comparable) toFind);
+            TreapGUI.treap.remove(toFind);
         TreapGUI.drawTreap();
     }
 
