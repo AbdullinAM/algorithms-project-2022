@@ -5,6 +5,7 @@ import org.junit.Test;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class SplayTreeTest {
 
@@ -173,11 +174,13 @@ public class SplayTreeTest {
         splayTree1.add(6);
 
         Set<Integer> set1 = new HashSet<>();
+        Set<Integer> treeSet = new TreeSet<>(splayTree1);
         Iterator<Integer> iterator = splayTree1.iterator();
         while (iterator.hasNext()) {
             set1.add(iterator.next());
         }
 
+        assertEquals(set1, treeSet);
         assertEquals(set1, splayTree1);
         assertTrue(splayTree1.containsAll(set1));
 
