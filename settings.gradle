@@ -8,3 +8,5 @@
  */
 
 rootProject.name = 'algorithms-project-2022'
+include 'app'
+

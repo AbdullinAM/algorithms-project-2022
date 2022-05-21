@@ -1,5 +1,3 @@
-package main;
-
 import java.util.*;
 
 public class SplayTree<T extends Comparable<T>> extends AbstractSet<T> implements Set<T> {
