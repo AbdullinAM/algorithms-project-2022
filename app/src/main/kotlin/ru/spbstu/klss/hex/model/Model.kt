@@ -69,6 +69,7 @@ class Model {
     }
 
     fun hasPath(cell: Cell, color: Color): Boolean {
+        if (cell.color == Color.GRAY) return false
         val stack = ArrayDeque<Pair<Cell, MutableIterator<Cell>>>()
         var currentCell = cell
         var currentIterator = currentCell.neighbours.iterator()
