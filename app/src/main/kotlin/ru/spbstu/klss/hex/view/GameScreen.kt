@@ -72,7 +72,6 @@ class GameScreen(
         if (solverFirst != null) turnQueue.add("solverFirst")
         if (solverSecond != null) turnQueue.add("solverSecond")
         if (turnQueue.size == currentPlayer) currentPlayer--
-
         createFont()
     }
 
@@ -86,20 +85,28 @@ class GameScreen(
         val textColor = if (currentColor == Color.RED) "Red"
         else "Blue"
 
-        var textPlayer = ""
+        var textPlayer1 = ""
+        var textPlayer2 = ""
+        var string = ""
         if (turnQueue.size == 1) {
-            if (textColor == "Red") textPlayer ="firstHuman"
-            else textPlayer = "secondHuman"
+            if (textColor == "Red") textPlayer1 ="firstHuman"
+            else textPlayer2 = "secondHuman"
         } else {
-            if (turnQueue[currentPlayer] == "human") textPlayer = "human"
+            if (turnQueue[currentPlayer] == "human") textPlayer1 = "human"
             else {
-                if (solverFirst != null) textPlayer = solverFirst.toString()
-                if (solverSecond != null) textPlayer = solverSecond.toString()
+                if (solverFirst != null) {
+                    textPlayer1 = solverFirst.toString()
+                    string = "Turn: " + textPlayer1 + System.getProperty("line.separator") + "" +
+                            "turnColor: $textColor"
+                }
+                if (solverSecond != null) {
+                    textPlayer2 = solverSecond.toString()
+                    string = "Turn: " + textPlayer2 + System.getProperty("line.separator") + "" +
+                            "turnColor: $textColor"
+                }
             }
         }
 
-        val string = "Turn: " + textPlayer + System.getProperty("line.separator") + "" +
-                "turnColor: $textColor"
 
         batch.begin();
         mainFont.draw(batch, string, 600f, -550f);
