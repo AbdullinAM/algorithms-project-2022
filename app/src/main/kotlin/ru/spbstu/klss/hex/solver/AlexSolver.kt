@@ -17,24 +17,23 @@ class AlexSolver(color: Color) : Solver{
         if (getCells(model.board, selfColor).size == 0) {
             if (model.getCell(5, 5).color == Color.GRAY)
                 return Pair(5, 5)
-            else
-                return Pair(4, 5)
+            return Pair(4, 5)
         }
 
         var maxScore = Int.MIN_VALUE
-        var result_x = -1
-        var result_y = -1
+        var resultX = -1
+        var resultY = -1
         for (element in getCells(model.board, Color.GRAY).sortedBy { abs(5 - it.x) + abs(5 - it.y)}) {
             element.color = selfColor
             val stepScore = alphaBeta(model, 1, Int.MIN_VALUE, Int.MAX_VALUE)
             if (stepScore > maxScore) {
                 maxScore = stepScore
-                result_x = element.x
-                result_y = element.y
+                resultX = element.x
+                resultY = element.y
             }
             element.reset()
         }
-        return Pair(result_x, result_y)
+        return Pair(resultX, resultY)
     }
 
     fun alphaBeta(model: Model, depth: Int, alpha: Int, beta: Int): Int {
@@ -110,7 +109,6 @@ class AlexSolver(color: Color) : Solver{
                     continue
                 }
                 val elementGCost = matrix[index(element.x, element.y)].gCost
-                val elementPath = matrix[index(element.x, element.y)].path
                 var weight = 1
 
 
