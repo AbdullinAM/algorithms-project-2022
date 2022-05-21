@@ -95,7 +95,7 @@ class AlexSolver(color: Color) : Solver{
         return result
     }
 
-    fun findMinPath(startCell: Cell, endCell: Cell, color: Color): Int {
+    fun dijkstra(startCell: Cell, endCell: Cell, color: Color): Int {
         fun index(x: Int, y: Int) = (y + 1) * 13 + x + 1
         val oppositeColor = if (color == Color.RED) Color.BLUE else Color.RED
         val matrix = Array(13 * 13) { Int.MAX_VALUE }
@@ -164,46 +164,52 @@ class AlexSolver(color: Color) : Solver{
             var gCost = gCost
             var hCost = hCost
             var fCost = gCost + hCost
+            var path = Int.MAX_VALUE
         }
         fun index(x: Int, y: Int) = (y + 1) * 13 + x + 1
-        fun hCost(cell: Cell) = abs(cell.x - endCell.x) + abs(cell.y - endCell.y)
+        fun hCost(cell: Cell) = if (cell.color == Color.BLUE) abs(cell.x - endCell.x) else abs(cell.y - endCell.y)
         val oppositeColor = if (color == Color.RED) Color.BLUE else Color.RED
         val matrix = Array(13 * 13) { CellStats(Int.MAX_VALUE, Int.MAX_VALUE) }
 
         val toCheck = mutableListOf(startCell)
         val visited = mutableListOf<Cell>()
         matrix[index(startCell.x, startCell.y)] = CellStats(0, hCost(startCell))
+        matrix[index(startCell.x, startCell.y)].path = 0
 
 
         while (toCheck.isNotEmpty()) {
             val currentCell = toCheck.sortedBy { matrix[index(it.x, it.y)].fCost }[0]
             val currentGCost = matrix[index(currentCell.x, currentCell.y)].gCost
+            val currentPath = matrix[index(currentCell.x, currentCell.y)].path
             toCheck.remove(currentCell)
             visited.add(currentCell)
 
-            if (currentCell == endCell) return currentGCost - 1
+            if (currentCell == endCell) return currentPath
 
             for (element in currentCell.neighbours) {
                 if (element in visited || element.color == oppositeColor) {
                     continue
                 }
                 val elementGCost = matrix[index(element.x, element.y)].gCost
+                val elementPath = matrix[index(element.x, element.y)].path
+                var weight = 1
 
 
-                if (element !in toCheck || currentGCost + 1 < elementGCost) {
+                if (element !in toCheck || currentGCost < elementGCost) {
                     if (element !in toCheck) toCheck.add(element)
                     if (element.color == color) {
-                        matrix[index(element.x, element.y)] = CellStats(currentGCost, hCost(element))
-                    } else {
-                        matrix[index(element.x, element.y)] = CellStats(currentGCost + 1, hCost(element))
+                        weight = 0
                     }
+                    matrix[index(element.x, element.y)] = CellStats(currentGCost + weight, hCost(element))
+                    matrix[index(element.x, element.y)].path = currentPath + weight
+
                 }
             }
             var resultString = ""
             for (y in 0..12) {
                 var row = ""
                 for (x in 0..12) {
-                    val number = matrix[y * 13 + x].gCost
+                    val number = matrix[y * 13 + x].path
                     when {
                         y == startCell.y + 1 && x == startCell.x + 1 -> row += "$number  "
                         y == endCell.y + 1 && x == endCell.x + 1 -> row += "$number "
