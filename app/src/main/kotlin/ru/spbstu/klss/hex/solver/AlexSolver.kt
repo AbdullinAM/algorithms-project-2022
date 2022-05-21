@@ -144,4 +144,8 @@ class AlexSolver(color: Color) : Solver{
         }
         return Int.MIN_VALUE
     }
+
+    override fun toString(): String {
+        return "AlexSolver"
+    }
 }

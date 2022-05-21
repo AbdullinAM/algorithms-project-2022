@@ -412,4 +412,8 @@ class SemaSolver(color: Color) : Solver {
         }
         return result
     }
+
+    override fun toString(): String {
+        return "SemaSolver"
+    }
 }
