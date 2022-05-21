@@ -15,8 +15,10 @@ class AlexSolver(color: Color) : Solver{
 
     val bridgeScore = 2
     val savedBridgeScore = 4
-    val sizeMultiplier = 4
+    val sizeMultiplier = 10
     val cellCountMultiplier = 1
+    val attackedBridgeScore = -6
+    val blockedEnemyBridgeScore = 4
 
     override fun action(board: MutableList<Cell>): Pair<Int, Int> { // returns X and Y
         if (getCells(board, selfColor).size == 0) {
@@ -90,7 +92,9 @@ class AlexSolver(color: Color) : Solver{
         var score = 0
         score += (countBridges(board, selfColor) - countBridges(board, enemyColor)) * bridgeScore
         score += countMaxLength(board, selfColor) - countMaxLength(board, enemyColor) * sizeMultiplier
+        score += (countAttackedBridges(board, selfColor) - countAttackedBridges(board, enemyColor)) * attackedBridgeScore
         score += (countSavedBridges(board, selfColor) - countSavedBridges(board, enemyColor)) * savedBridgeScore
+        score += (countEnemyBlockedBridges(board, selfColor) - countEnemyBlockedBridges(board, enemyColor)) * blockedEnemyBridgeScore
         score += (getCells(board, selfColor).size - getCells(board, enemyColor).size) * cellCountMultiplier
         if (countMaxLength(board, selfColor) == 11) score += 1000
         else if (countMaxLength(board, enemyColor) == 11) score -= 1000
@@ -176,6 +180,39 @@ class AlexSolver(color: Color) : Solver{
         return bridgeCount
     }
 
+    fun countAttackedBridges(board: MutableList<Cell>, currentColor: Color): Int {
+        var bridgeCount = 0
+        val currentCellList = getCells(board, currentColor)
+
+        for (i in 0 until currentCellList.size) {
+            for (j in i + 1 until currentCellList.size) {
+                val cell1 = currentCellList[i]
+                val cell2 = currentCellList[j]
+                if (isAttackedBridge(cell1, cell2, board)) {
+                    bridgeCount++
+                }
+            }
+        }
+        return bridgeCount
+    }
+
+    fun countEnemyBlockedBridges(board: MutableList<Cell>, currentColor: Color): Int {
+        var bridgeCount = 0
+        val oppositeColor = if (currentColor == Color.RED) Color.BLUE else Color.RED
+        val currentCellList = getCells(board, oppositeColor)
+
+        for (i in 0 until currentCellList.size) {
+            for (j in i + 1 until currentCellList.size) {
+                val cell1 = currentCellList[i]
+                val cell2 = currentCellList[j]
+                if (isBlockedBridge(cell1, cell2, board)) {
+                    bridgeCount++
+                }
+            }
+        }
+        return bridgeCount
+    }
+
     fun isBridge(cell1: Cell, cell2: Cell): Boolean {
         if (cell1.color != cell2.color || Color.GRAY in listOf(cell1.color, cell2.color)) return false
         val deltaX = cell1.x - cell2.x
@@ -206,6 +243,33 @@ class AlexSolver(color: Color) : Solver{
         if (
             bridgeNeibhours.first.color == oppositeColor &&
             bridgeNeibhours.second.color == bridgeNeibhours.first.color
+        ) return true
+        return false
+
+
+    }
+
+    fun isAttackedBridge(cell1: Cell, cell2: Cell, board: MutableList<Cell>): Boolean {
+        if (!isBridge(cell1, cell2)) return false
+        val deltaX = cell1.x - cell2.x
+        val deltaY = cell1.y - cell2.y
+        val bridgeNeibhours: Pair<Cell, Cell>
+        val oppositeColor = if (cell1.color == Color.RED) Color.BLUE else Color.RED
+
+        if (abs(deltaX) == 2) bridgeNeibhours = Pair(
+            board[countIndex((cell1.x + cell2.x) / 2, cell1.y)],
+            board[countIndex((cell1.x + cell2.x) / 2, cell2.y)]
+        ) else if (abs(deltaY) == 2) bridgeNeibhours = Pair(
+            board[countIndex(cell1.x, (cell1.y + cell2.y) / 2)],
+            board[countIndex(cell2.x, (cell1.y + cell2.y) / 2)]
+        ) else bridgeNeibhours = Pair(
+            board[countIndex(cell1.x, cell2.y)],
+            board[countIndex(cell2.x, cell1.y)]
+        )
+
+        if (
+            Color.GRAY in listOf(bridgeNeibhours.first.color, bridgeNeibhours.second.color) &&
+            oppositeColor in listOf(bridgeNeibhours.first.color, bridgeNeibhours.second.color)
         ) return true
         return false
 

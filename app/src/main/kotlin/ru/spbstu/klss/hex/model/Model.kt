@@ -83,8 +83,8 @@ class Model {
                 val nextCell = currentIterator.next()
                 if (nextCell.color != color || nextCell in visited) continue
 
-                if (nextCell.color == Color.BLUE && nextCell.y == 10) return true
-                if (nextCell.color == Color.RED && nextCell.x == 10) return true
+                if (color == nextCell.color && nextCell.color == Color.BLUE && nextCell.y == 10) return true
+                if (color == nextCell.color && nextCell.color == Color.RED && nextCell.x == 10) return true
 
                 visited.add(currentCell)
                 currentCell = nextCell
