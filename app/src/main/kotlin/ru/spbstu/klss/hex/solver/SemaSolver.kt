@@ -157,19 +157,19 @@ class SemaSolver(color: Color) : Solver {
             board,
             enemyColor
         )) * attackedDiagonalMultiplayer
-        
+
         score += (countSavedDiagonals(board, selfColor) - countSavedDiagonals(
             board,
             enemyColor
         )) * savedDiagonalMultiplayer
-        
+
         score += (countEnemyBlockedDiagonals(board, selfColor) - countEnemyBlockedDiagonals(
             board,
             enemyColor
         )) * blockedEnemyDiagonalMultiplayer
-        
+
         score += (getCells(board, selfColor).size - getCells(board, enemyColor).size) * cellCountMultiplier
-        
+
         if (countMaxLength(board, selfColor) == 11) score += 1000
         else if (countMaxLength(board, enemyColor) == 11) score -= 1000
 
@@ -188,7 +188,7 @@ class SemaSolver(color: Color) : Solver {
         }
         return result
     }
-    
+
     fun cellConnects(cell: Cell): HashSet<Cell> {
         val result = hashSetOf<Cell>()
         for (neighbour in cell.neighbours) {
@@ -225,9 +225,10 @@ class SemaSolver(color: Color) : Solver {
     }
 
     fun isDiagonal(cell1: Cell, cell2: Cell): Boolean {
+        if (cell1.color != cell2.color) return false
         var ways = 0
         for (neighbour in cell1.neighbours) {
-            if (neighbour.color == Color.GRAY && cell2 in neighbour.neighbours) ways++
+            if (cell2 in neighbour.neighbours) ways++
         }
         return ways == 2
     }
@@ -327,7 +328,7 @@ class SemaSolver(color: Color) : Solver {
         }
         return diagonalCount
     }
-    
+
     fun isBlockedDiagonal(cell1: Cell, cell2: Cell, board: MutableList<Cell>): Boolean {
         if (!isDiagonal(cell1, cell2)) return false
         val deltaX = cell1.x - cell2.x
