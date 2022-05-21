@@ -43,10 +43,11 @@ class SemaSolverTest {
     fun isBridgeTest() {
         val random = Random()
         val solver = SemaSolver(Color.RED)
+        val model = Model()
 
         for (i in 0..100) {
-            val x = random.nextInt()
-            val y = random.nextInt()
+            val x = random.nextInt(2, 8)
+            val y = random.nextInt(2, 8)
 
             // Board view
             // - 4 - - -
@@ -56,19 +57,15 @@ class SemaSolverTest {
             // - - - 5 -
             // Where numbers are bridgeCells, C - centerCell
 
-            val centerCell = Cell(x, y)
+            val centerCell = model.getCell(x, y)
             val bridgeCells = mutableListOf(
-                Cell(x - 1, y + 1),
-                Cell(x + 1, y - 1),
-                Cell(x - 2, y - 1),
-                Cell(x - 1, y - 2),
-                Cell(x + 1, y + 2),
-                Cell(x + 2, y + 1)
+                model.getCell(x - 1, y + 1),
+                model.getCell(x + 1, y - 1),
+                model.getCell(x - 2, y - 1),
+                model.getCell(x - 1, y - 2),
+                model.getCell(x + 1, y + 2),
+                model.getCell(x + 2, y + 1)
             )
-
-            for (element in bridgeCells) {
-                assertFalse(solver.isDiagonal(centerCell, element))
-            }
 
             centerCell.color = Color.BLUE
 
@@ -79,7 +76,10 @@ class SemaSolverTest {
                 element.reset()
                 element.color = Color.BLUE
                 assertTrue(solver.isDiagonal(centerCell, element))
+                element.reset()
             }
+
+            centerCell.reset()
             println("All clear")
         }
     }
@@ -241,7 +241,7 @@ class SemaSolverTest {
         model1.setCellColor(5, 4, Color.RED)
         model1.setCellColor(5, 6, Color.RED)
 
-        assertEquals(6 - 1, solver.diagonalsCount(model1.board))
+        assertEquals(6, solver.diagonalsCount(model1.board))
     }
 
     @Test
@@ -284,7 +284,7 @@ class SemaSolverTest {
         model1.setCellColor(5, 6, Color.RED)
         model1.setCellColor(5, 7, Color.RED)
 
-        assertEquals(4, solver.countSavedDiagonals(model1.board, Color.RED))
+        assertEquals(6, solver.countSavedDiagonals(model1.board, Color.RED))
     }
 
     @Test
@@ -322,6 +322,6 @@ class SemaSolverTest {
         model1.setCellColor(9, 2, Color.RED)
 
 
-        assertEquals(10, solver.countMaxLength(model1.board, Color.RED))
+        assertEquals(11, solver.countMaxLength(model1.board, Color.RED))
     }
 }
