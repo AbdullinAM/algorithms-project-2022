@@ -180,7 +180,7 @@ class SemaSolver(color: Color) : Solver {
         return score
     }
 
-    private fun connectsCount(board: MutableList<Cell>): Int {
+    fun connectsCount(board: MutableList<Cell>): Int {
         var result = 0
         for (cell in board) {
             if (cell.color == selfColor) result += cellConnects(cell).size
@@ -189,7 +189,7 @@ class SemaSolver(color: Color) : Solver {
         return result
     }
     
-    private fun cellConnects(cell: Cell): HashSet<Cell> {
+    fun cellConnects(cell: Cell): HashSet<Cell> {
         val result = hashSetOf<Cell>()
         for (neighbour in cell.neighbours) {
             if (cell.color == neighbour.color) result.add(neighbour)
@@ -296,7 +296,7 @@ class SemaSolver(color: Color) : Solver {
         return diagonalCount
     }
 
-    private fun countAttackedDiagonals(board: MutableList<Cell>, currentColor: Color): Int {
+    fun countAttackedDiagonals(board: MutableList<Cell>, currentColor: Color): Int {
         var diagonalCount = 0
         val currentCellList = getCells(board, currentColor)
 
@@ -312,7 +312,7 @@ class SemaSolver(color: Color) : Solver {
         return diagonalCount
     }
 
-    private fun countEnemyBlockedDiagonals(board: MutableList<Cell>, currentColor: Color): Int {
+    fun countEnemyBlockedDiagonals(board: MutableList<Cell>, currentColor: Color): Int {
         var diagonalCount = 0
         val oppositeColor = if (currentColor == Color.RED) Color.BLUE else Color.RED
         val currentCellList = getCells(board, oppositeColor)
@@ -355,7 +355,7 @@ class SemaSolver(color: Color) : Solver {
 
     }
 
-    private fun isAttackedDiagonal(cell1: Cell, cell2: Cell, board: MutableList<Cell>): Boolean {
+    fun isAttackedDiagonal(cell1: Cell, cell2: Cell, board: MutableList<Cell>): Boolean {
         if (!isDiagonal(cell1, cell2)) return false
         val deltaX = cell1.x - cell2.x
         val deltaY = cell1.y - cell2.y
@@ -403,7 +403,7 @@ class SemaSolver(color: Color) : Solver {
         return false
     }
 
-    private fun countIndex(x: Int, y: Int) = y * 11 + x
+    fun countIndex(x: Int, y: Int) = y * 11 + x
 
     fun getCells(board: MutableList<Cell>, color: Color): MutableList<Cell> {
         val result = mutableListOf<Cell>()
