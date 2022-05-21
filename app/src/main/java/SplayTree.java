@@ -60,7 +60,6 @@ public class SplayTree<T extends Comparable<T>> extends AbstractSet<T> implement
      * Zig выполняется только один раз в конце, если глубина x - нечётна.
      *
      * Zig-zig: если x и p находятся оба либо в левом поддереве, либо в правом - либо оба левые дети, либо правые.
-     *
      * splay(g, p) -> splay(p, x)
      *
      * Zig-zag: если x - левый ребёнок, а p - правый (и наоборот).
@@ -264,8 +263,8 @@ public class SplayTree<T extends Comparable<T>> extends AbstractSet<T> implement
      */
     @Override
     public boolean addAll(Collection<? extends T> c) {
-        for (Object o : c) {
-            this.add((T) o);
+        for (T t : c) {
+            this.add(t);
         }
         return true;
     }
@@ -384,6 +383,7 @@ public class SplayTree<T extends Comparable<T>> extends AbstractSet<T> implement
      * Преобразование дерева в определённый массив
      */
     @Override
+    @SuppressWarnings("unchecked")
     public Object[] toArray(Object[] a) {
         if (a == null) {
             throw new NullPointerException();
