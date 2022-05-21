@@ -18,6 +18,10 @@ public class Game {
         initFirstMove();
     }
 
+    public int getBombsAmount() {
+        return board.getBombsAmount() - flags;
+    }
+
     public Cell[][] getVisibleBoard() { return this.visibleBoard; }
 
     private void initFirstMove() {

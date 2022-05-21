@@ -5,6 +5,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public class MineSweeper extends JFrame {
 
@@ -14,6 +15,7 @@ public class MineSweeper extends JFrame {
     private final int rows;
     private final int IMAGE_SIZE = 50;
     private Game game;
+    private final MineSweeperSolver solver;
 
     public static void main(String[] args) {
         new MineSweeper(10, 10);
@@ -23,11 +25,13 @@ public class MineSweeper extends JFrame {
         this.cols = cols;
         this.rows = rows;
         this.game = new Game(cols, rows, 20);
+        this.solver = new MineSweeperSolver(game.getVisibleBoard(), new Coord(cols, rows));
         initImages();
         initLabel();
         initPanel();
         initFrame();
     }
+
 
     private void initFrame() {
         pack();
@@ -39,18 +43,50 @@ public class MineSweeper extends JFrame {
     }
 
     private void initLabel() {
-        JButton button = new JButton("Start");
-        button.addActionListener(e -> startNewGame());
+        JButton startButton = new JButton("Start");
+        JButton solveButton = new JButton("Solve");
+        startButton.addActionListener(e -> startNewGame());
+        solveButton.addActionListener(e -> startSolve());
         label = new JLabel(getLabelText());
         add(label, BorderLayout.SOUTH);
-        add(button, BorderLayout.NORTH);
+        add(startButton, BorderLayout.NORTH);
+        add(solveButton, BorderLayout.EAST);
+    }
+
+    private void startSolve() {
+        if (game.getState() == GameState.PLAYING) {
+            solver.setVisibleBoard(game.getVisibleBoard());
+            List<CellGroup> solutions = solver.solve();
+
+            while (solutions.size() != 0 && game.getState() == GameState.PLAYING) {
+                for (CellGroup group : solutions) {
+                    if (group.getCellList().size() == group.getNumOfMines()) {
+                        for (Coord coord : group.getCellList()) {
+                            if (game.getState() == GameState.PLAYING &&
+                                    game.getVisibleBoard()[coord.getX()][coord.getY()] != Cell.FLAGGED) {
+                                game.onRightButtonPressed(coord);
+                            }
+                        }
+                    } else if (group.getNumOfMines() <= 0) {
+                        for (Coord coord : group.getCellList()) {
+                            if (game.getState() == GameState.PLAYING)
+                                game.onLeftButtonPressed(coord);
+                        }
+                    }
+                }
+                label.setText(getLabelText());
+                panel.repaint();
+                solver.setVisibleBoard(game.getVisibleBoard());
+                solutions = solver.solve();
+            }
+        }
     }
 
     private String getLabelText() {
         return switch (game.getState()) {
             case WIN -> "You win!";
             case LOSE -> "You lose";
-            case PLAYING -> "Have fun!";
+            case PLAYING -> "Have fun! \nBombs amount: " + game.getBombsAmount();
         };
     }
 

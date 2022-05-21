@@ -6,10 +6,9 @@ import java.util.Random;
 public class Board {
     private final Coord size;
     private final int bombsAmount;
-    private int flagsAmount;
     private Cell [] [] visibleBoardState;
     private Cell [] [] hiddenBoardState;
-    private final List<Coord> bombs = new ArrayList<Coord>();
+    private final List<Coord> bombs = new ArrayList<>();
     Random r = new Random();
 
     public Board(int cols, int rows,  int bombsAmount) {
