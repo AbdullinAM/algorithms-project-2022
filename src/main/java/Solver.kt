@@ -2,7 +2,7 @@ import Game.tiles
 import Game.move
 import kotlin.math.abs
 
-class Solver {
+public class Solver {
     private val dx = arrayOf(0, -1, 0, 1)
     private val dy = arrayOf(1, 0, -1, 0)
     private var resultString = ""
