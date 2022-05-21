@@ -83,17 +83,10 @@ public class Treap<T extends Comparable<T>> {
                     node.right = remove(node.right, x);
                 }
             } else {
-                System.out.println("deleteroot" + node.x);
-                if (node.left != null) {
-                    System.out.println(node.left.x);
+                if (node.left != null)
                     node = node.left;
-                    System.out.println(node.x);
-                    System.out.println("NewRoot" + root.x);
-                } else {
-                    System.out.println(node.right.x);
+                else {
                     node = node.right;
-                    System.out.println(node.x);
-                    System.out.println("NewRoot" + root.x);
                 }
             }
             if (isRoot)

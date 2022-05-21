@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-
+<?import javafx.scene.text.Font?>
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="540.0" minWidth="810.0" prefHeight="540.0" prefWidth="810.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="treap.TreapController">
    <children>
@@ -17,25 +17,37 @@
             <AnchorPane fx:id="mainpane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="490.0" prefWidth="800.0" />
          </content>
       </ScrollPane>
-      <HBox maxHeight="40.0" minHeight="40.0" minWidth="810.0" prefHeight="40.0" prefWidth="810.0" VBox.vgrow="ALWAYS">
+      <HBox maxHeight="40.0" minHeight="40.0" minWidth="810.0" prefHeight="40.0" prefWidth="810.0" style="-fx-background-color: black;" VBox.vgrow="ALWAYS">
          <children>
-            <ButtonBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="50.0" prefWidth="73.0">
+            <ButtonBar minWidth="90.0" nodeOrientation="RIGHT_TO_LEFT" prefHeight="50.0" prefWidth="90.0">
               <buttons>
-                <Button mnemonicParsing="false" onAction="#clear" text="Очистить" />
+                <Button mnemonicParsing="false" onAction="#clear" style="-fx-background-color: #cc9d1d;" text="Очистить">
+                     <font>
+                        <Font size="14.0" />
+                     </font></Button>
               </buttons>
                <HBox.margin>
                   <Insets left="5.0" />
                </HBox.margin>
             </ButtonBar>
-            <TextField fx:id="data" prefWidth="1800.0">
+            <TextField fx:id="data" minHeight="28.0" prefHeight="28.0" prefWidth="1800.0" style="-fx-background-color: #beb9b4;">
                <HBox.margin>
-                  <Insets bottom="8.0" top="8.0" />
+                  <Insets bottom="8.0" top="7.0" />
                </HBox.margin>
+               <font>
+                  <Font size="14.0" />
+               </font>
             </TextField>
-            <ButtonBar nodeOrientation="LEFT_TO_RIGHT" prefHeight="50.0" prefWidth="215.0" HBox.hgrow="ALWAYS">
+            <ButtonBar minWidth="205.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="50.0" prefWidth="205.0" HBox.hgrow="ALWAYS">
                <buttons>
-                  <Button mnemonicParsing="false" onAction="#add" prefHeight="25.0" prefWidth="84.0" text="Добавить" />
-                  <Button mnemonicParsing="false" onAction="#delete" text="Удалить" />
+                  <Button mnemonicParsing="false" onAction="#add" prefHeight="30.0" prefWidth="90.0" style="-fx-background-color: #83e546;" text="Добавить">
+                     <font>
+                        <Font size="14.0" />
+                     </font></Button>
+                  <Button mnemonicParsing="false" onAction="#delete" style="-fx-background-color: e44c4c;" text="Удалить">
+                     <font>
+                        <Font size="14.0" />
+                     </font></Button>
                </buttons>
                <HBox.margin>
                   <Insets right="5.0" />
