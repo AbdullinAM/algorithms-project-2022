@@ -37,23 +37,6 @@ class AlexSolver(color: Color) : Solver{
         return Pair(result_x, result_y)
     }
 
-    fun minimax(model: Model, depth: Int): Int {
-        var result = if (depth % 2 == 1) Int.MAX_VALUE else Int.MIN_VALUE
-        if (depth == limitDepth) return countScore(model)
-        for (element in getCells(model.board, Color.GRAY).sortedBy { abs(5 - it.x) + abs(5 - it.y)}) {
-            element.color = if (depth % 2 == 1) enemyColor else selfColor
-            val score = minimax(model, depth + 1)
-            element.reset()
-            if (depth % 2 == 1) {
-                result = min(result, score)
-
-            } else {
-                result = max(result, score)
-            }
-        }
-        return result
-    }
-
     fun alphaBeta(model: Model, depth: Int, alpha: Int, beta: Int): Int {
         var result = if (depth % 2 == 1) Int.MAX_VALUE else Int.MIN_VALUE
         var beta = beta
@@ -79,11 +62,11 @@ class AlexSolver(color: Color) : Solver{
 
     fun countScore(model: Model): Int {
         var score = 0
-        val redCoefficient = if (selfColor == Color.RED) 1 else -1
+        val redCoefficient = if (selfColor == Color.RED) -1 else 1
         val blueCoefficient = redCoefficient * -1
 
-        score += redCoefficient * (11 - aStar(model.redStartBase, model.redEndBase, Color.RED))
-        score += blueCoefficient * (11 - aStar(model.blueStartBase, model.blueEndBase, Color.BLUE))
+        score += redCoefficient * aStar(model.redStartBase, model.redEndBase, Color.RED)
+        score += blueCoefficient * aStar(model.blueStartBase, model.blueEndBase, Color.BLUE)
         return score
     }
 
@@ -93,70 +76,6 @@ class AlexSolver(color: Color) : Solver{
             if (cell.color == color) result.add(cell)
         }
         return result
-    }
-
-    fun dijkstra(startCell: Cell, endCell: Cell, color: Color): Int {
-        fun index(x: Int, y: Int) = (y + 1) * 13 + x + 1
-        val oppositeColor = if (color == Color.RED) Color.BLUE else Color.RED
-        val matrix = Array(13 * 13) { Int.MAX_VALUE }
-        val visited = mutableListOf<Cell>()
-        var currentCell: Cell
-        var currentIterator: Iterator<Cell>
-        val stack = ArrayDeque<Cell>()
-
-        matrix[index(startCell.x, startCell.y)] = 0
-        stack.addLast(startCell)
-
-        while (stack.isNotEmpty()) {
-            currentCell = stack.last()
-            currentIterator = currentCell.neighbours.iterator()
-            var minPathWay = Int.MAX_VALUE
-            var nextCell: Cell? = null
-
-            while (currentIterator.hasNext()) {
-                var weight = 1
-                val checkedCell = currentIterator.next()
-                if (checkedCell in visited) continue
-                if (checkedCell.color == oppositeColor) continue
-                else if (checkedCell.color == color) {
-                    weight = 0
-                }
-                val currentCellPathWay = matrix[index(currentCell.x, currentCell.y)]
-                val checkedCellPathWay = matrix[index(checkedCell.x, checkedCell.y)]
-                matrix[index(checkedCell.x, checkedCell.y)] = min(currentCellPathWay + weight, checkedCellPathWay)
-                if (matrix[index(checkedCell.x, checkedCell.y)] < minPathWay) {
-                    nextCell = checkedCell
-                    minPathWay = matrix[index(checkedCell.x, checkedCell.y)]
-                }
-
-            }
-            visited.add(currentCell)
-            if (nextCell != null) {
-                stack.addLast(nextCell)
-            } else {
-                stack.removeLast()
-            }
-            var resultString = ""
-            for (y in 0..12) {
-                var row = ""
-                for (x in 0..12) {
-                    val number = matrix[y * 13 + x]
-                    when {
-                        y == startCell.y + 1 && x == startCell.x + 1 -> row += "$number  "
-                        y == endCell.y + 1 && x == endCell.x + 1 -> row += "$number "
-                        y == 0 || y == 12 -> row += "*  "
-                        x == 0 || x == 12 -> row += "*  "
-                        number == Int.MAX_VALUE -> row += "-  "
-                        number < 10 -> row += "$number  "
-                        else -> row += "$number "
-                    }
-                }
-                row += "\n"
-                resultString += row
-            }
-            //println(resultString)
-        }
-        return matrix[index(endCell.x, endCell.y)]
     }
 
     fun aStar(startCell: Cell, endCell: Cell, color: Color): Int {
