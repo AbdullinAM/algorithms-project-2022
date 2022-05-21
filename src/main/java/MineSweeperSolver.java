@@ -22,12 +22,9 @@ public class MineSweeperSolver {
         List<CellGroup> groups = createGroups();
 
         List<CellGroup> solution = solveGroups(groups);
-        System.out.println("Optimised groups: \n" + solution);
-        System.out.println("Group size: " + solution.size());
         if (solution.size() == 0) {
             groups = createGroups();
             solution = guessingByPossibilities(groups);
-            System.out.println("Guessing");
         }
         return solution;
     }
@@ -69,11 +66,7 @@ public class MineSweeperSolver {
         return allGroups;
     }
 
-    /**
-     * Создает список групп ячеек, связанных одним значением открытого поля, а также разбивает их на более мелкие, удаляет повторяющиеся.
-     */
     private List<CellGroup> solveGroups(List<CellGroup> groups) {
-        //System.out.println("Input groups: \n" + groups);
         List<CellGroup> solutions;
         boolean repeat;
         do {
@@ -108,25 +101,8 @@ public class MineSweeperSolver {
                     }
                     solutions = checkSolutions(groups);
                     if (solutions.size() != 0) {
-                        //System.out.println("Parent: " + parent + " Child: " + child);
                         return solutions;
                     }
-                    /*else if (groupI.overlaps(groupJ) > 0) {    // иначе если группы пересекаются
-                        if (groupI.getNumOfMines() > groupJ.getNumOfMines()) {
-                            parent = groupI;
-                            child = groupJ;
-                        } else {
-                            child = groupI;
-                            parent = groupJ;
-                        }
-                        CellGroup overlap = parent.getOverlap(child);// то берем результат пересечения
-                        if (overlap != null) {                  //  и если он имеет смысл (в результате пересечения выявились ячейки с 0% или 100%)
-                            groups.add(overlap);                //  то вносим соответствующие коррективы в список
-                            parent.subtraction(overlap);
-                            child.subtraction(overlap);
-                            repeat = true;
-                        }
-                    }*/
                 }
             }
         }

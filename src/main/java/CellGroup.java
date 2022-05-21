@@ -1,9 +1,8 @@
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class CellGroup {
-    private List<Coord> cellList;
+    private final List<Coord> cellList;
     private int numOfMines;
 
     public CellGroup(List<Coord> cells, int numOfMines) {
@@ -19,17 +18,11 @@ public class CellGroup {
         return cellList;
     }
 
-    public void setCellList(List<Coord> cellList) {
-        this.cellList = cellList;
-    }
 
     public int getNumOfMines() {
         return numOfMines;
     }
 
-    public void setNumOfMines(int numOfMines) {
-        this.numOfMines = numOfMines;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -53,14 +46,6 @@ public class CellGroup {
         this.numOfMines = this.numOfMines - child.getNumOfMines();
     }
 
-    public int overlaps(CellGroup group) {
-        int k = 0;
-        for (Coord coord: group.cellList) {
-            if (this.cellList.contains(coord))
-                k++;
-        }
-        return k;
-    }
 
     @Override
     public String toString() {
@@ -70,14 +55,4 @@ public class CellGroup {
                 '}' + "\n";
     }
 
-    public CellGroup getOverlap(CellGroup child) {
-        List<Coord> list = new ArrayList<>();
-        for (Coord coord: child.cellList) {
-            if (this.cellList.contains(coord)) {
-                list.add(coord);
-            }
-        }
-        int mines = this.numOfMines - (child.cellList.size() - list.size());
-        return new CellGroup(list, mines);
-    }
 }

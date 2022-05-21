@@ -21,7 +21,7 @@ public class MineSweeper extends JFrame {
         new MineSweeper(10, 10);
     }
 
-    private MineSweeper(int cols, int rows) {
+    public MineSweeper(int cols, int rows) {
         this.cols = cols;
         this.rows = rows;
         this.game = new Game(cols, rows, 20);
@@ -31,7 +31,6 @@ public class MineSweeper extends JFrame {
         initPanel();
         initFrame();
     }
-
 
     private void initFrame() {
         pack();
@@ -53,7 +52,7 @@ public class MineSweeper extends JFrame {
         add(solveButton, BorderLayout.EAST);
     }
 
-    private void startSolve() {
+    public void startSolve() {
         if (game.getState() == GameState.PLAYING) {
             solver.setVisibleBoard(game.getVisibleBoard());
             List<CellGroup> solutions = solver.solve();
@@ -123,12 +122,11 @@ public class MineSweeper extends JFrame {
         });
     }
 
-    private void startNewGame() {
+    public void startNewGame() {
         this.game = new Game(cols, rows, 20);
         label.setText(getLabelText());
         panel.repaint();
     }
-
 
     private void initImages() {
         for (Cell cell: Cell.values()) {
@@ -144,5 +142,9 @@ public class MineSweeper extends JFrame {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public Game getGame() {
+        return game;
     }
 }

@@ -18,6 +18,14 @@ public class Game {
         initFirstMove();
     }
 
+    public Cell[][] getHiddenBoard() {
+        return hiddenBoard;
+    }
+
+    public int getClosedCellsAmount() {
+        return closedCellsAmount;
+    }
+
     public int getBombsAmount() {
         return board.getBombsAmount() - flags;
     }
@@ -67,8 +75,6 @@ public class Game {
     private void revealAround(Coord coord) {
         int x = coord.getX();
         int y = coord.getY();
-        System.out.println("Bombs around: " + board.around(x, y, Cell.BOMB, hiddenBoard));
-        System.out.println("Flags amount: " + board.around(x, y, Cell.FLAGGED, visibleBoard));
         if (board.around(x, y, Cell.BOMB, hiddenBoard) == board.around(x, y, Cell.FLAGGED, visibleBoard)) {
             for (int i = x - 1; i <= x + 1; i++) {
                 for (int j = y - 1; j <= y + 1; j++) {
