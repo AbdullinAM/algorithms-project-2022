@@ -145,6 +145,11 @@ class GameScreen(
                 playerMakeMove = !human
             }
         }
+        if (gameOver) {
+            gameOver()
+        } else {
+            fieldRender()
+        }
 
         if (playerMakeMove && delay > 0f)
             delay -= delta
