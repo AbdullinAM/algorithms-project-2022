@@ -24,9 +24,13 @@ public class TreapController {
         String text = data.getText();
         if (text.isEmpty() || TreapGUI.empty) return;
         TreapGUI.type type = TreapGUI.type;
-        Object toFind;
+        Object toFind = null;
         if (type == TreapGUI.type.DOUBLE) {
-            toFind = Double.parseDouble(text);
+            try {
+                toFind = Double.parseDouble(text);
+            } catch (NumberFormatException e) {
+                falseDouble();
+            }
         } else {
             toFind = text;
         }
@@ -44,6 +48,15 @@ public class TreapController {
         } else
             TreapGUI.treap.remove(TreapGUI.treap.root, (Comparable) toFind);
         TreapGUI.drawTreap();
+    }
+
+    private void falseDouble() {
+        ImageView failView = new ImageView("/11.png");
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Некорректный элемент");
+        alert.setHeaderText("Видимо, вы проводите операции со строками в дереве чисел");
+        alert.setGraphic(failView);
+        alert.showAndWait();
     }
 
     @FXML
@@ -94,12 +107,7 @@ public class TreapController {
             try {
                 TreapGUI.treap.add(Double.parseDouble(text));
             } catch (NumberFormatException e) {
-                ImageView failView = new ImageView("/11.png");
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Некорректный элемент");
-                alert.setHeaderText("Видимо, вы попытались загрузить строку в дерево чисел");
-                alert.setGraphic(failView);
-                alert.showAndWait();
+                falseDouble();
             }
         } else {
             TreapGUI.treap.add(text);
