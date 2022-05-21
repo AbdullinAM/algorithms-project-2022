@@ -11,23 +11,27 @@ class AlexSolver(color: Color) : Solver{
 
     val selfColor = color
     val enemyColor = if (selfColor == Color.RED) Color.BLUE else Color.RED
-    val currentBoard: MutableList<Cell> = Model().board
-    val moveOrder = ArrayDeque<Cell>()
-    val limitDepth = 2
+    val limitDepth = 3
 
-    val bridgeScore = 3
-    val savedBridgeScore = 3
-    val sizeMultiplier = 2
+    val bridgeScore = 2
+    val savedBridgeScore = 4
+    val sizeMultiplier = 4
     val cellCountMultiplier = 1
-    var iteratorStop = 0
 
     override fun action(board: MutableList<Cell>): Pair<Int, Int> { // returns X and Y
+        if (getCells(board, selfColor).size == 0) {
+            if (board[5 * 11 + 5].color == Color.GRAY)
+                return Pair(5, 5)
+            else
+                return Pair(4, 5)
+        }
+
         var maxScore = -1000
         var result_x = -1
         var result_y = -1
         for (element in getCells(board, Color.GRAY)) {
             element.color = selfColor
-            val stepScore = step(board, 1)
+            val stepScore = alphaBeta(board, 1, -10000, 10000)
             if (stepScore > maxScore) {
                 maxScore = stepScore
                 result_x = element.x
@@ -38,16 +42,48 @@ class AlexSolver(color: Color) : Solver{
         return Pair(result_x, result_y)
     }
 
-    fun step(board: MutableList<Cell>, depth: Int): Int {
+    fun minimax(board: MutableList<Cell>, depth: Int): Int {
         val scoreList = mutableListOf<Int>()
+        var result = if (depth % 2 == 1) 10000 else -10000
         if (depth == limitDepth) return countScore(board)
         for (element in getCells(board, Color.GRAY)) {
             element.color = if (depth % 2 == 1) enemyColor else selfColor
-            val score = step(board, depth + 1)
+            val score = minimax(board, depth + 1)
             scoreList.add(score)
             element.reset()
+            if (depth % 2 == 1) {
+                result = min(result, score)
+
+            } else {
+                result = max(result, score)
+            }
         }
-        return if (depth % 2 == 1) scoreList.minOrNull() ?: -1000 else scoreList.maxOrNull() ?: 1000
+        //return if (depth % 2 == 1) scoreList.minOrNull() ?: -1000 else scoreList.maxOrNull() ?: 1000
+        return result
+    }
+
+    fun alphaBeta(board: MutableList<Cell>, depth: Int, alpha: Int, beta: Int): Int {
+        var result = if (depth % 2 == 1) 10000 else -10000
+        var beta = beta
+        var alpha = alpha
+        if (depth == limitDepth) return countScore(board)
+        for (element in getCells(board, Color.GRAY)) {
+            element.color = if (depth % 2 == 1) enemyColor else selfColor
+            val score = alphaBeta(board, depth + 1, alpha, beta)
+            element.reset()
+            if (depth % 2 == 1) {
+                result = min(result, score)
+                beta = min(beta, score)
+
+            } else {
+                result = max(result, score)
+                alpha = max(alpha, score)
+            }
+            if (beta <= alpha) {
+                break
+            }
+        }
+        return result
     }
 
     fun countScore(board: MutableList<Cell>): Int {
