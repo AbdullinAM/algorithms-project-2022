@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.ScreenUtils
 import ru.spbstu.klss.hex.controller.Hex
 import ru.spbstu.klss.hex.model.Color
 import ru.spbstu.klss.hex.solver.AlexSolver
+import ru.spbstu.klss.hex.solver.SemaSolver
 
 
 class MainMenuScreen(val game: Hex) : Screen {
@@ -108,7 +109,7 @@ class MainMenuScreen(val game: Hex) : Screen {
         humanAndSema = ImageButton(humanAndSemaStyle)
         humanAndSema.addListener(object : ChangeListener() {
             override fun changed(event: ChangeEvent?, actor: Actor?) {
-                game.screen = GameScreen(game, /*SemaSolver*/AlexSolver(Color.BLUE), human = true)
+                game.screen = GameScreen(game, SemaSolver(Color.BLUE), human = true)
             }
         }
         )
