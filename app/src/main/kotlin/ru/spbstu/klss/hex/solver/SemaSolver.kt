@@ -124,24 +124,6 @@ class SemaSolver(color: Color) : Solver {
             } else {
                 stack.removeLast()
             }
-            var resultString = ""
-            for (y in 0..12) {
-                var row = ""
-                for (x in 0..12) {
-                    val number = matrix[y * 13 + x]
-                    row += when {
-                        y == startCell.y + 1 && x == startCell.x + 1 -> "$number  "
-                        y == endCell.y + 1 && x == endCell.x + 1 -> "$number "
-                        y == 0 || y == 12 -> "*  "
-                        x == 0 || x == 12 -> "*  "
-                        number == Int.MAX_VALUE -> "-  "
-                        number < 10 -> "$number  "
-                        else -> "$number "
-                    }
-                }
-                row += "\n"
-                resultString += row
-            }
         }
         return matrix[index(endCell.x, endCell.y)]
     }
