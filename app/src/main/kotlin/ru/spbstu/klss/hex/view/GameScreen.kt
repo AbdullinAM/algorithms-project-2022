@@ -40,7 +40,7 @@ class GameScreen(
     private var currentPlayer = 0//Random.nextInt(0, 1)
     private val turnQueue = ArrayList<String>()
 
-    private val delayConst = 1.6f
+    private val delayConst = 1f
     private var delay: Float = delayConst
     private var playerMakeMove = !human
 
@@ -109,8 +109,6 @@ class GameScreen(
                 }
                 if (solverSecond != null && turnQueue[currentPlayer] == "solverSecond") {
                     textPlayer2 = solverSecond.toString()
-                    string = "Turn: " + textPlayer2 + System.getProperty("line.separator") + "" +
-                            "turnColor: $textColor"
                 }
             }
         }
@@ -123,13 +121,6 @@ class GameScreen(
         linedShapeRenderer.begin(ShapeRenderer.ShapeType.Line)
         filledShapeRenderer.begin(ShapeRenderer.ShapeType.Filled)
 
-
-        if (gameOver) {
-            gameOver()
-        } else {
-            fieldRender()
-        }
-
         if (playerMakeMove && delay > 0f)
             delay -= delta
         else {
@@ -140,6 +131,7 @@ class GameScreen(
                 makeMove()
                 delay = delayConst
                 playerMakeMove = !human
+
             }
         }
         if (gameOver) {
@@ -147,6 +139,10 @@ class GameScreen(
         } else {
             fieldRender()
         }
+
+        batch.begin();
+        mainFont.draw(batch, string, 600f, -550f);
+        batch.end();
 
         if (playerMakeMove && delay > 0f)
             delay -= delta
@@ -157,7 +153,15 @@ class GameScreen(
                 makeMove()
                 delay = delayConst
                 playerMakeMove = !human
+                string = "Turn: " + textPlayer2 + System.getProperty("line.separator") + "" +
+                        "turnColor: $textColor"
             }
+        }
+
+        if (gameOver) {
+            gameOver()
+        } else {
+            fieldRender()
         }
 
         linedShapeRenderer.end()

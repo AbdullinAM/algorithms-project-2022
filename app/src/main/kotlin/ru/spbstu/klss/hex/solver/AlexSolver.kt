@@ -61,8 +61,8 @@ class AlexSolver(color: Color) : Solver{
 
     fun countScore(model: Model): Int {
         var score = 0
-        val redCoefficient = if (selfColor == Color.RED) -1 else 1
-        val blueCoefficient = redCoefficient * -1
+        val redCoefficient = if (selfColor == Color.RED) -2 else 2
+        val blueCoefficient = redCoefficient * -1 / 2
 
         score += redCoefficient * aStar(model.redStartBase, model.redEndBase, Color.RED)
         score += blueCoefficient * aStar(model.blueStartBase, model.blueEndBase, Color.BLUE)

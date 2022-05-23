@@ -16,11 +16,11 @@ class SemaSolver(color: Color) : Solver {
     //koef
     private val connectCountMultiplayer = 1
     private val diagonalCountMultiplayer = 3
-    private val savedDiagonalMultiplayer = 4
-    private val sizeMultiplier = 5
+    private val savedDiagonalMultiplayer = 3
+    private val sizeMultiplier =  8
     private val cellCountMultiplier = 1
-    private val attackedDiagonalMultiplayer = -4
-    private val blockedEnemyDiagonalMultiplayer = 3
+    private val attackedDiagonalMultiplayer = -7
+    private val blockedEnemyDiagonalMultiplayer = 10
 
 
     override fun action(model: Model): Pair<Int, Int> { // returns X and Y
@@ -29,7 +29,7 @@ class SemaSolver(color: Color) : Solver {
             return if (board[5 * 11 + 5].color == Color.GRAY)
                 Pair(5, 5)
             else
-                Pair(4, 5)
+                Pair(6, 5)
         }
 
         var maxScore = Int.MIN_VALUE
@@ -155,7 +155,7 @@ class SemaSolver(color: Color) : Solver {
         if (countMaxLength(board, selfColor) == 11) score += 1000
         else if (countMaxLength(board, enemyColor) == 11) score -= 1000
 
-        val redDexMultiplayer = if (selfColor == Color.RED) 10 else -10
+        val redDexMultiplayer = if (selfColor == Color.RED) 7 else -7
         val blueDexMultiplayer = redDexMultiplayer * -1
         score += redDexMultiplayer * (11 - djhxtra(model.redStartBase, model.redEndBase, Color.RED))
         score += blueDexMultiplayer * (11 - djhxtra(model.blueStartBase, model.blueEndBase, Color.BLUE))
