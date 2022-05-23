@@ -123,7 +123,7 @@ class AlexSolver(color: Color) : Solver{
                 }
             }
         }
-        return Int.MIN_VALUE
+        return Int.MAX_VALUE
     }
 
     override fun toString(): String {

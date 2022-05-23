@@ -155,7 +155,7 @@ class SemaSolver(color: Color) : Solver {
         if (countMaxLength(board, selfColor) == 11) score += 1000
         else if (countMaxLength(board, enemyColor) == 11) score -= 1000
 
-        val redCoefficient = if (selfColor == Color.RED) 1 else -1
+        val redCoefficient = if (selfColor == Color.RED) 10 else -10
         val blueCoefficient = redCoefficient * -1
         score += redCoefficient * (11 - djhxtra(model.redStartBase, model.redEndBase, Color.RED))
         score += blueCoefficient * (11 - djhxtra(model.blueStartBase, model.blueEndBase, Color.BLUE))

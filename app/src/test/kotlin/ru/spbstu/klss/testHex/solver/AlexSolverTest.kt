@@ -109,6 +109,29 @@ class AlexSolverTest {
         assertEquals(6, solver.aStar(model2.blueStartBase, model2.blueEndBase, Color.BLUE))
         assertEquals(5, solver.aStar(model2.redStartBase, model2.redEndBase, Color.RED))
 
+        val model3 = Model()
+
+        //Board view
+        //   | 0 1 2 3 4 5 6 7 8 9 10
+        // -------------------------
+        // 0 | - - - - - - - - - - -
+        // 1 | - - - - - - - - - - -
+        // 2 | - - - - - - - - - - -
+        // 3 | - - - - - - - - - - -
+        // 4 | - - B B B B B - - - -
+        // 5 | - R R R R R R R R R R
+        // 6 | - - - - B B B B - - B
+        // 7 | - - - - - - - - - - -
+        // 8 | - - - - - - - - - - -
+        // 9 | - - - - - - - - - - -
+        // 10| - - - - - - - - - - -
+
+        for (x in 1..10) model3.setCellColor(x, 5, Color.RED)
+        for (x in 4..7) model3.setCellColor(x, 6, Color.BLUE)
+        for (x in 2..6) model3.setCellColor(x, 4, Color.BLUE)
+        model3.setCellColor(10, 6, Color.BLUE)
+
+        assertEquals(1, solver.aStar(model3.redStartBase, model3.redEndBase, Color.RED))
     }
 
     @Test
