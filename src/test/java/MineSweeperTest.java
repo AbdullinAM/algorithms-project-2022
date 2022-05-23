@@ -9,7 +9,7 @@ public class MineSweeperTest {
 
     @Test
     public void solve() {
-        MineSweeper ms = new MineSweeper(10, 10);
+        MineSweeper ms = new MineSweeper(10, 10, 20);
         Game game = ms.getGame();
         assertEquals(game.getState(), GameState.PLAYING);
 
