@@ -96,7 +96,11 @@ class GameScreen(
                         "turnColor: $textColor"
             }
         } else {
-            if (turnQueue[currentPlayer] == "human") textPlayer1 = "human"
+            if (turnQueue[currentPlayer] == "human") {
+                textPlayer1 = "human"
+                string = "Turn: " + textPlayer1 + System.getProperty("line.separator") + "" +
+                        "turnColor: $textColor"
+            }
             else {
                 if (solverFirst != null && turnQueue[currentPlayer] == "solverFirst") {
                     textPlayer1 = solverFirst.toString()
@@ -118,14 +122,7 @@ class GameScreen(
 
         linedShapeRenderer.begin(ShapeRenderer.ShapeType.Line)
         filledShapeRenderer.begin(ShapeRenderer.ShapeType.Filled)
-        var xtest = 36f
-        val xchange = 26.5f
-        if (debug) {
-            for (i in 1..22) {
-                linedShapeRenderer.line(xtest, 0f, xtest, -600f)
-                xtest += xchange
-            }
-        }
+
 
         if (gameOver) {
             gameOver()
