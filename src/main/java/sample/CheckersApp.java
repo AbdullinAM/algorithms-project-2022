@@ -1,14 +1,22 @@
 package sample;
 
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.effect.BoxBlur;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+
 import java.util.*;
 
 public class CheckersApp extends Application {
@@ -22,24 +30,43 @@ public class CheckersApp extends Application {
     private final Label state = new Label();
     private final Label err = new Label();
     private final Button restart = new Button();
+    {
+        restart.setFocusTraversable(false);
+        restart.setMinHeight(CELL_SIZE / 2.0);
+        restart.setMinWidth(CELL_SIZE * 2);
+        restart.setText("restart?");
+        restart.setFont(new Font(20));
+        restart.relocate(CELL_SIZE * 5.75, CELL_SIZE * 8.25);
+        restart.setOnMouseClicked(event -> {
+            next = null;
+            player = Opponent.WHITE;
+            numWhiteCheckers = 12;
+            numBlackCheckers = 12;
+            createChoosingWindow();
+            state.setText("Начало игры: ходят белые");
+            err.setText("");
+            checkersGroup.getChildren().removeAll(checkersGroup.getChildren());
+            for (int y = 0; y < 8; y++)
+                for (int x = 0; x < 8; x++) {
+                    Checker checker = null;
+                    if ((x + y) % 2 != 0) {
+                        if (y <= 2) checker = makeChecker(CheckerType.BLACK, x, y);
+                        else if (y >= 5) checker = makeChecker(CheckerType.WHITE, x, y);
+                    }
+                    board[x][y].setChecker(checker);
+                    if (checker != null) checkersGroup.getChildren().add(checker);
+                }
+        });
+    }
 
     Checker next;
     Opponent player;
-
-    public void setPlayer() {
-        player = player.opposite();
-    }
-
+    Opponent computerPlayer = Opponent.WHITE;
     int numWhiteCheckers;
     int numBlackCheckers;
 
-    public CheckersApp(){
-        state.setText("test");
-        next = null;
-        player = Opponent.WHITE;
-        numWhiteCheckers = 12;
-        numBlackCheckers = 12;
-
+    public void setPlayer() {
+        player = player.opposite();
     }
 
     public void decreaseNumChecker(CheckerType type, int n) {
@@ -57,11 +84,54 @@ public class CheckersApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        Scene scene = new Scene(createBoard());
+
+        Parent board = createBoard();
+
+        Scene scene = new Scene(board);
         primaryStage.setTitle("CheckersApp");
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         primaryStage.show();
+        createChoosingWindow();
+    }
+
+    public void createChoosingWindow(){
+        Stage choosingWindow = new Stage();
+
+        choosingWindow.initModality(Modality.APPLICATION_MODAL);
+        choosingWindow.setResizable(false);
+        choosingWindow.initStyle(StageStyle.UNDECORATED);
+        VBox p = new VBox();
+
+        Button white = new Button("white");
+        white.setOnAction(event->{
+            computerPlayer = Opponent.BLACK;
+            choosingWindow.close();
+        });
+        Button black = new Button("black");
+        black.setOnAction(event->{
+            computerPlayer = Opponent.WHITE;
+            choosingWindow.close();
+        });
+
+        p.setAlignment(Pos.CENTER);
+
+        p.getChildren().add(white);
+        p.getChildren().add(black);
+
+        white.setFocusTraversable(false);
+        black.setFocusTraversable(false);
+
+        white.setMaxWidth(Double.MAX_VALUE);
+        black.setMaxWidth(Double.MAX_VALUE);
+        white.setMinHeight(CELL_SIZE);
+        black.setMinHeight(CELL_SIZE);
+
+        Scene scene = new Scene(p, 3*CELL_SIZE, 2*CELL_SIZE);
+        choosingWindow.setScene(scene);
+        choosingWindow.setTitle("Выберите цвет");
+
+        choosingWindow.showAndWait();
     }
 
     public Parent createBoard() {
@@ -73,32 +143,7 @@ public class CheckersApp extends Application {
         root.setPrefSize(8 * CELL_SIZE, 9 * CELL_SIZE);
         root.getChildren().addAll(cellsGroup, checkersGroup);
         root.getChildren().addAll(state, err);
-
-        restart.setMinHeight(CELL_SIZE / 2.0);
-        restart.setMinWidth(CELL_SIZE * 2);
-        restart.setText("restart?");
-        restart.setFont(new Font(20));
-        restart.relocate(CELL_SIZE * 5.75, CELL_SIZE * 8.25);
         root.getChildren().add(restart);
-        restart.setOnMouseClicked(event -> {
-            next = null;
-            player = Opponent.WHITE;
-            numWhiteCheckers = 12;
-            numBlackCheckers = 12;
-            state.setText("Начало игры: ходят белые");
-            err.setText("");
-            checkersGroup.getChildren().removeAll(checkersGroup.getChildren());
-            for (int y = 0; y < 8; y++)
-                for (int x = 0; x < 8; x++) {
-                    Checker checker = null;
-                    if ((x + y) % 2 != 0) {
-                        if (y <= 2) checker = makeChecker(CheckerType.BLACK, x, y);
-                        else if (y >= 5) checker = makeChecker(CheckerType.WHITE, x, y);
-                    }
-                    board[x][y].setChecker(checker);
-                    if (checker != null) checkersGroup.getChildren().add(checker);
-                }
-        });
 
         state.setText("Начало игры: ходят белые");
         state.setFont(new Font(20));
@@ -127,7 +172,7 @@ public class CheckersApp extends Application {
         return root;
     }
 
-    public Checker makeChecker(CheckerType type, int x, int y) {
+    public Checker makeChecker(CheckerType type, int x, int y) {//возможно стоит перенести в класс
         Checker checker = new Checker(type, x, y);
 
         checker.setOnMouseReleased(event -> {
