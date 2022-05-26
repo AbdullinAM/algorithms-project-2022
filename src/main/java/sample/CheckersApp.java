@@ -16,6 +16,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Pair;
 
 import java.util.*;
 
@@ -175,11 +176,14 @@ public class CheckersApp extends Application {
     public Checker makeChecker(CheckerType type, int x, int y) {//возможно стоит перенести в класс
         Checker checker = new Checker(type, x, y);
 
-        checker.setOnMouseReleased(event -> {
+        checker.setOnMouseReleased(event -> {//основная часть подойдет и для хода компьютера, нужно вынести в отдельную функцию
             int newX = toBoardIndex(checker.getLayoutX());
             int newY = toBoardIndex(checker.getLayoutY());
-
-            List<MoveResult> result = tryMove(checker, newX, newY);
+            List<MoveResult> result;
+            if (player == computerPlayer) {
+                result = computerChoose();
+            }
+            else result = tryMove(checker, newX, newY);
 
             int x0 = toBoardIndex(checker.getX());
             int y0 = toBoardIndex(checker.getY());
@@ -209,6 +213,11 @@ public class CheckersApp extends Application {
             }
         });
         return checker;
+    }
+
+    public List<MoveResult> computerChoose() {//TODO
+        List<MoveResult> none = new ArrayList<>();
+        return none;
     }
 
     public int toBoardIndex(double pixel) {
@@ -306,8 +315,8 @@ public class CheckersApp extends Application {
             }
             state.setText("Ход: " + player.toString() + (next != null ? " продолжают бой" : ""));
         } else {
-            int signX = (newX - x0) / Math.abs(newX - x0);
-            int signY = (newY - y0) / Math.abs(newY - y0);
+            int signX = (newX - x0) / Math.abs(newX - x0);//направление перемещения (-1 или 1 по обеим осям)
+            int signY = (newY - y0) / Math.abs(newY - y0);//
 
             if (next != null && (next.getX() != checker.getX() || next.getY() != checker.getY())) {
                 err.setText("Необходимо продолжить бой");
@@ -388,6 +397,8 @@ public class CheckersApp extends Application {
         }
         return false;
     }
+
+    //public List<Pair<Integer, Integer>> posibleMovings(){ }
 
     public static void main(String[] args) {
         launch(args);
