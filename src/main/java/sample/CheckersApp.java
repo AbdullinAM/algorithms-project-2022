@@ -25,6 +25,7 @@ public class CheckersApp extends Application {
     public static final int CELL_SIZE = 90;
     public static final int UNREAL_DIR_OR_INDEX = -2;
 
+    private ComputerSide boardStateForII;
     private final Cell[][] board = new Cell[8][8];
     private final Group cellsGroup = new Group();
     private final Group checkersGroup = new Group();
@@ -180,10 +181,10 @@ public class CheckersApp extends Application {
             int newX = toBoardIndex(checker.getLayoutX());
             int newY = toBoardIndex(checker.getLayoutY());
             List<MoveResult> result;
-            if (player == computerPlayer) {
+            /*if (player == computerPlayer) {//TODO
                 result = computerChoose();
             }
-            else result = tryMove(checker, newX, newY);
+            else */result = tryMove(checker, newX, newY);
 
             int x0 = toBoardIndex(checker.getX());
             int y0 = toBoardIndex(checker.getY());
@@ -293,7 +294,7 @@ public class CheckersApp extends Application {
                         next = null;
                         result.add(new MoveResult(MoveType.KILL, board[x1][y1].getChecker()));
 
-                        if (fightIsPossibleForPosition(type, newX, newY, x1, y1)) {
+                        if (fightIsPossibleForPosition(type, newX, newY)) {
                             next = new Checker(type, newX, newY);
                         } else {
                             setPlayer();
@@ -337,14 +338,14 @@ public class CheckersApp extends Application {
             }
             if (!result.isEmpty()) {
                 next = null;
-                if (fightIsPossibleForPosition(type, newX, newY, signX, signY))
+                if (fightIsPossibleForPosition(type, newX, newY))
                     next = new Checker(type, newX, newY);
                 else setPlayer();
                 state.setText("Ход: " + player.toString() + (next != null ? " продолжают бой" : ""));
                 err.setText("");
                 return result;
             }
-            if (fightIsPossibleForColor(type)) {
+            if (fightIsPossibleForColor(type)) {//TODO вынести в отдельную переменную
                 err.setText("Игнорирование возможности взятия");
                 return none;
             }
@@ -356,24 +357,23 @@ public class CheckersApp extends Application {
         return result;
     }
 
-    public boolean fightIsPossibleForPosition(CheckerType type, int x, int y, int killOrSignX, int killOrSignY) {
+    public boolean fightIsPossibleForPosition(CheckerType type, int x, int y) {
         if (type.isCommon()) {
-            return x < 6 && y < 6 && (x + 1 != killOrSignX || y + 1 != killOrSignY) && board[x + 1][y + 1].hasChecker() &&
+            return x < 6 && y < 6 && board[x + 1][y + 1].hasChecker() &&
                     !sameColor(x + 1, y + 1, type) && !board[x + 2][y + 2].hasChecker() ||
 
-                    x > 1 && y > 1 && (x - 1 != killOrSignX || y - 1 != killOrSignY) && board[x - 1][y - 1].hasChecker() &&
+                    x > 1 && y > 1 && board[x - 1][y - 1].hasChecker() &&
                             !sameColor(x - 1, y - 1, type) && !board[x - 2][y - 2].hasChecker() ||
 
-                    x < 6 && y > 1 && (x + 1 != killOrSignX || y - 1 != killOrSignY) && board[x + 1][y - 1].hasChecker() &&
+                    x < 6 && y > 1 && board[x + 1][y - 1].hasChecker() &&
                             !sameColor(x + 1, y - 1, type) && !board[x + 2][y - 2].hasChecker() ||
 
-                    x > 1 && y < 6 && (x - 1 != killOrSignX || y + 1 != killOrSignY) && board[x - 1][y + 1].hasChecker() &&
+                    x > 1 && y < 6 && board[x - 1][y + 1].hasChecker() &&
                             !sameColor(x - 1, y + 1, type) && !board[x - 2][y + 2].hasChecker();
         } else {
             boolean killer = false;
             for (int i = -1; i < 2; i += 2)
                 for (int j = -1; j < 2; j += 2) {
-                    if (killOrSignX * (-1) == i && killOrSignY * (-1) == j) continue;
                     for (int n = 1; x + n * i < 8 && y + n * j < 8 && x + n * i >= 0 && y + n * j >= 0; n++) {
                         if (board[x + n * i][y + n * j].hasChecker()) {
                             if (sameColor(x + n * i, y + n * j, type)) break;
@@ -390,7 +390,7 @@ public class CheckersApp extends Application {
         for (int y = 0; y < 8; y++) {
             for (int x = 0; x < 8; x++) {
                 if (!board[x][y].hasChecker() || !sameColor(x, y, type)) continue;
-                if (fightIsPossibleForPosition(board[x][y].getChecker().getType(), x, y, UNREAL_DIR_OR_INDEX, UNREAL_DIR_OR_INDEX)) {
+                if (fightIsPossibleForPosition(board[x][y].getChecker().getType(), x, y)) {
                     return true;
                 }
             }
