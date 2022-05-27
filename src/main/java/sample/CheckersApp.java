@@ -15,17 +15,17 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Pair;
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.*;
+
+import static sample.ComputerSide.KING_SORE;
+import static sample.ComputerSide.DEPTH;
 
 public class CheckersApp extends Application {
 
     public static final int CELL_SIZE = 90;
     //public static final int UNREAL_DIR_OR_INDEX = -2;
 
-    private Pair<Integer,Integer> computerLastMove = null;
+    private Pair<Integer,Integer> checkerForNextComputerMove = null;
 
     public ComputerSide boardToState(){
         int[][] state = new int[8][8];
@@ -35,14 +35,16 @@ public class CheckersApp extends Application {
                 switch (board[x][y].getChecker().getType()) {
                     case BLACK -> state[y][x] = 1;
                     case WHITE -> state[y][x] = -1;
-                    case B_KING -> state[y][x] = 3;
-                    default -> state[y][x] = -3;
+                    case B_KING -> state[y][x] = KING_SORE;
+                    default -> state[y][x] = -KING_SORE;
                 }
             }
         int computerSide;
         if (computerPlayer == Opponent.BLACK) computerSide = 1;
         else computerSide = -1;
-        return new ComputerSide(state, computerSide, computerLastMove);
+        if (next != null)
+            return new ComputerSide(state, computerSide, checkerForNextComputerMove);
+        else return new ComputerSide(state, computerSide, null);
     }
 
     private final Cell[][] board = new Cell[8][8];
@@ -116,9 +118,11 @@ public class CheckersApp extends Application {
         createChoosingWindow();
         if (computerPlayer == Opponent.WHITE){
             ComputerSide t = boardToState();
-            int[] i = t.minimaxStart(2);
-            computerLastMove = new Pair<>(i[3],i[2]);
+            int[] i = t.minimaxStart(DEPTH);
             move(board[i[0]][i[1]].getChecker(),i[0],i[1],i[2],i[3]);
+            if (next !=null){
+                checkerForNextComputerMove = new Pair<>(i[3],i[2]);
+            }
         }
     }
 
@@ -202,7 +206,6 @@ public class CheckersApp extends Application {
     public void move(Checker checker, int x0, int y0, int newX, int newY){
         List<MoveResult> result = tryMove(checker, newX, newY);
 
-
         switch (result.get(0).getType()) {
             case NONE -> checker.abortMove();
             case NORMAL -> {
@@ -230,7 +233,7 @@ public class CheckersApp extends Application {
     public Checker makeChecker(CheckerType type, int x, int y) {//возможно стоит перенести в класс
         Checker checker = new Checker(type, x, y);
 
-        checker.setOnMouseReleased(event -> {//основная часть подойдет и для хода компьютера, нужно вынести в отдельную функцию
+        checker.setOnMouseReleased(event -> {
             if (computerPlayer == player) {
                 checker.abortMove();
                 err.setText("Ход шашкой другого игрока");
@@ -240,12 +243,14 @@ public class CheckersApp extends Application {
             move(checker,toBoardIndex(checker.getX()), toBoardIndex(checker.getY()),
                     toBoardIndex(checker.getLayoutX()), toBoardIndex(checker.getLayoutY()));
 
-
+            if (winner() != null) return;
             while (computerPlayer == player) {
                 ComputerSide t = boardToState();
-                int[] i = t.minimaxStart(2);
-                computerLastMove = new Pair<>(i[3],i[2]);
+                int[] i = t.minimaxStart(DEPTH);
                 move(board[i[0]][i[1]].getChecker(),i[0],i[1],i[2],i[3]);
+                if (next != null){
+                    checkerForNextComputerMove = new Pair<>(i[3],i[2]);
+                }//TODO дописаь выход при невозможности хода
 
             }
         });
@@ -374,7 +379,7 @@ public class CheckersApp extends Application {
                 err.setText("");
                 return result;
             }
-            if (fightIsPossibleForColor(type)) {//TODO вынести в отдельную переменную
+            if (fightIsPossibleForColor(type)) {
                 err.setText("Игнорирование возможности взятия");
                 return none;
             }
