@@ -2,7 +2,7 @@ package sample;
 
 import javafx.util.Pair;
 
-public class ComputerSide {
+public class Computer {
 
     public static final int KING_SORE = 5;
     public static final int DEPTH = 7;
@@ -22,7 +22,7 @@ public class ComputerSide {
         return rivalInQuestion * i < 0;
     }
 
-    public ComputerSide() {
+    public Computer() {
         state = new int[][]{{0, 1, 0, 1, 0, 1, 0, 1},
                 {1, 0, 1, 0, 1, 0, 1, 0},
                 {0, 1, 0, 1, 0, 1, 0, 1},
@@ -48,7 +48,7 @@ public class ComputerSide {
         return cost;
     }
 
-    public ComputerSide(int[][] m, int s, Pair<Integer,Integer> p) {
+    public Computer(int[][] m, int s, Pair<Integer,Integer> p) {
         side = s;
         rivalInQuestion = s;
         state = m;
@@ -62,7 +62,7 @@ public class ComputerSide {
         return x > 7 || x < 0 || y > 7 || y < 0;
     }
 
-    public ComputerSide(ComputerSide prev, int y, int x, int newY, int newX, boolean wasFight) {
+    public Computer(Computer prev, int y, int x, int newY, int newX, boolean wasFight) {
         int dirX = newX - x;
         int delta = Math.abs(dirX);
         dirX /= delta;
@@ -103,7 +103,7 @@ public class ComputerSide {
                     for (int i = -1; i < 2; i += 2)
                         for (int j = -1; j < 2; j += 2) {
                             if (!outOfLimits(x + 2 * i, y + 2 * j) && isEnemy(state[y + j][x + i]) && state[y + 2 * j][x + 2 * i] == 0) {
-                                ComputerSide newState = new ComputerSide(this, y, x, y + 2 * j, x + 2 * i, true);
+                                Computer newState = new Computer(this, y, x, y + 2 * j, x + 2 * i, true);
                                 int k = newState.minimax(depth - 1);
                                 if(k >= r){
                                     r = k;
@@ -120,7 +120,7 @@ public class ComputerSide {
                             for (int n = 1; !outOfLimits(x + n * i, y + n * j); n++) {
                                 if (isFriend(state[y + j * n][x + i * n])) break;
                                 if (state[y + j * n][x + i * n] == 0) {
-                                    ComputerSide newState = new ComputerSide(this, y, x, y + n * j, x + n * i, true);
+                                    Computer newState = new Computer(this, y, x, y + n * j, x + n * i, true);
                                     int k = newState.minimax(depth - 1);
                                     if(k >= r){
                                         r = k;
@@ -136,7 +136,7 @@ public class ComputerSide {
                                     if (outOfLimits(y + j * n, x + i * n)) {
                                         break;
                                     } else {
-                                        ComputerSide newState = new ComputerSide(this, y, x, y + n * j, x + n * i, true);
+                                        Computer newState = new Computer(this, y, x, y + n * j, x + n * i, true);
                                         int k = newState.minimax(depth - 1);
                                         if(k >= r){
                                             r = k;
@@ -158,7 +158,7 @@ public class ComputerSide {
                     if (checker == 0 || !isFriend(checker)) continue;
                     if (Math.abs(checker) == 1) {
                         if (!outOfLimits(y + checker, x + checker) && state[y + checker][x + checker] == 0) {
-                            ComputerSide newState = new ComputerSide(this, y, x, y + checker, x + checker, false);
+                            Computer newState = new Computer(this, y, x, y + checker, x + checker, false);
                             int k = newState.minimax(depth - 1);
                             if(k >= r){
                                 r = k;
@@ -169,7 +169,7 @@ public class ComputerSide {
                             }
                         }
                         if (!outOfLimits(y + checker, x - checker) && state[y + checker][x - checker] == 0) {
-                            ComputerSide newState = new ComputerSide(this, y, x, y + checker, x - checker, false);
+                            Computer newState = new Computer(this, y, x, y + checker, x - checker, false);
                             int k = newState.minimax(depth - 1);
                             if(k >= r){
                                 r = k;
@@ -184,7 +184,7 @@ public class ComputerSide {
                             for (int j = -1; j < 2; j += 2) {
                                 for (int n = 1; !outOfLimits(x + n * i, y + n * j); n++) {
                                     if (state[y][x] != 0) break;
-                                    ComputerSide newState = new ComputerSide(this, y, x, y + n * j, x + n * i, false);
+                                    Computer newState = new Computer(this, y, x, y + n * j, x + n * i, false);
                                     int k = newState.minimax(depth - 1);
                                     if(k >= r){
                                         r = k;
@@ -209,7 +209,7 @@ public class ComputerSide {
                         for (int i = -1; i < 2; i += 2)
                             for (int j = -1; j < 2; j += 2) {
                                 if (!outOfLimits(x + 2 * i, y + 2 * j) && isEnemy(state[y + j][x + i]) && state[y + 2*j][x + 2*i] == 0) {
-                                    ComputerSide newState = new ComputerSide(this, y, x, y + 2 * j, x + 2 * i, true);
+                                    Computer newState = new Computer(this, y, x, y + 2 * j, x + 2 * i, true);
                                     int k = newState.minimax(depth - 1);
                                     if(k >= r){
                                         r = k;
@@ -226,7 +226,7 @@ public class ComputerSide {
                                 for (int n = 1; !outOfLimits(x + n * i, y + n * j); n++) {
                                     if (isFriend(state[y + j * n][x + i * n])) break;
                                     if (state[y + j * n][x + i * n] == 0) {
-                                        ComputerSide newState = new ComputerSide(this, y, x, y + n * j, x + n * i, true);
+                                        Computer newState = new Computer(this, y, x, y + n * j, x + n * i, true);
                                         int k = newState.minimax(depth - 1);
                                         if(k >= r){
                                             r = k;
@@ -241,7 +241,7 @@ public class ComputerSide {
                                         } while (!outOfLimits(y + j * n, x + i * n) && isEnemy(state[y + j * n][x + i * n]));
                                         if (outOfLimits(y + j * n, x + i * n)) break;
                                         else {
-                                            ComputerSide newState = new ComputerSide(this, y, x, y + n * j, x + n * i, true);
+                                            Computer newState = new Computer(this, y, x, y + n * j, x + n * i, true);
                                             int k = newState.minimax(depth - 1);
                                             if (k >= r) {
                                                 r = k;
@@ -283,7 +283,7 @@ public class ComputerSide {
                 for (int i = -1; i < 2; i += 2)
                     for (int j = -1; j < 2; j += 2) {
                         if (!outOfLimits(x + 2 * i, y + 2 * j) && isEnemy(state[y + j][x + i]) && state[y + 2 * j][x + 2 * i] == 0) {
-                            ComputerSide newState = new ComputerSide(this, y, x, y + 2 * j, x + 2 * i, true);
+                            Computer newState = new Computer(this, y, x, y + 2 * j, x + 2 * i, true);
                             r = minOrMax(newState.minimax(depth - 1), r);
                         }
                     }
@@ -293,7 +293,7 @@ public class ComputerSide {
                         for (int n = 1; !outOfLimits(x + n * i, y + n * j); n++) {
                             if (isFriend(state[y + j * n][x + i * n])) break;
                             if (state[y + j * n][x + i * n] == 0) {
-                                ComputerSide newState = new ComputerSide(this, y, x, y + n * j, x + n * i, true);
+                                Computer newState = new Computer(this, y, x, y + n * j, x + n * i, true);
                                 r = minOrMax(newState.minimax(depth - 1), r);
                             } else {
                                 do {
@@ -301,7 +301,7 @@ public class ComputerSide {
                                 } while (!outOfLimits(y + j * n, x + i * n) && isEnemy(state[y + j * n][x + i * n]));
                                 if (outOfLimits(y + j * n, x + i * n)) break;
                                 else {
-                                    ComputerSide newState = new ComputerSide(this, y, x, y + n * j, x + n * i, true);
+                                    Computer newState = new Computer(this, y, x, y + n * j, x + n * i, true);
                                     r = minOrMax(newState.minimax(depth - 1), r);
                                 }
 
@@ -316,11 +316,11 @@ public class ComputerSide {
                     if (checker == 0 || !isFriend(checker)) continue;
                     if (Math.abs(checker) == 1) {
                         if (!outOfLimits(y + checker, x + checker) && state[y + checker][x + checker] == 0) {
-                            ComputerSide newState = new ComputerSide(this, y, x, y + checker, x + checker, false);
+                            Computer newState = new Computer(this, y, x, y + checker, x + checker, false);
                             r = minOrMax(newState.minimax(depth - 1), r);
                         }
                         if (!outOfLimits(y + checker, x - checker) && state[y + checker][x - checker] == 0) {
-                            ComputerSide newState = new ComputerSide(this, y, x, y + checker, x - checker, false);
+                            Computer newState = new Computer(this, y, x, y + checker, x - checker, false);
                             r = minOrMax(newState.minimax(depth - 1), r);
                         }
                     } else {
@@ -328,7 +328,7 @@ public class ComputerSide {
                             for (int j = -1; j < 2; j += 2) {
                                 for (int n = 1; !outOfLimits(x + n * i, y + n * j); n++) {
                                     if (state[y][x] != 0) break;
-                                    ComputerSide newState = new ComputerSide(this, y, x, y + n * j, x + n * i, false);
+                                    Computer newState = new Computer(this, y, x, y + n * j, x + n * i, false);
                                     r = minOrMax(newState.minimax(depth - 1), r);
                                 }
 
@@ -346,7 +346,7 @@ public class ComputerSide {
                         for (int i = -1; i < 2; i += 2)
                             for (int j = -1; j < 2; j += 2) {
                                 if (!outOfLimits(x + 2 * i, y + 2 * j) && isEnemy(state[y + j][x + i]) && state[y + 2 * j][x + 2 * i] == 0) {
-                                    ComputerSide newState = new ComputerSide(this, y, x, y + 2 * j, x + 2 * i, true);
+                                    Computer newState = new Computer(this, y, x, y + 2 * j, x + 2 * i, true);
                                     r = minOrMax(newState.minimax(depth - 1), r);
                                 }
                             }
@@ -356,7 +356,7 @@ public class ComputerSide {
                                 for (int n = 1; !outOfLimits(x + n * i, y + n * j); n++) {
                                     if (isFriend(state[y + j * n][x + i * n])) break;
                                     if (state[y + j * n][x + i * n] == 0) {
-                                        ComputerSide newState = new ComputerSide(this, y, x, y + n * j, x + n * i, true);
+                                        Computer newState = new Computer(this, y, x, y + n * j, x + n * i, true);
                                         r = minOrMax(newState.minimax(depth - 1), r);
                                     } else {
                                         do {
@@ -364,7 +364,7 @@ public class ComputerSide {
                                         } while (!outOfLimits(y + j * n, x + i * n) && isEnemy(state[y + j * n][x + i * n]));
                                         if (outOfLimits(y + j * n, x + i * n)) break;
                                         else{
-                                            ComputerSide newState = new ComputerSide(this, y, x, y + n * j, x + n * i, true);
+                                            Computer newState = new Computer(this, y, x, y + n * j, x + n * i, true);
                                             r = minOrMax(newState.minimax(depth - 1), r);
                                         }
 

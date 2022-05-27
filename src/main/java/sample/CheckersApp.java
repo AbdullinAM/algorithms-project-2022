@@ -17,8 +17,8 @@ import javafx.util.Pair;
 
 import java.util.*;
 
-import static sample.ComputerSide.KING_SORE;
-import static sample.ComputerSide.DEPTH;
+import static sample.Computer.KING_SORE;
+import static sample.Computer.DEPTH;
 
 public class CheckersApp extends Application {
 
@@ -27,7 +27,7 @@ public class CheckersApp extends Application {
 
     private Pair<Integer,Integer> checkerForNextComputerMove = null;
 
-    public ComputerSide boardToState(){
+    public Computer boardToState(){
         int[][] state = new int[8][8];
         for (int y = 0; y < 8; y++)
             for (int x = 0; x < 8; x++) {
@@ -43,8 +43,8 @@ public class CheckersApp extends Application {
         if (computerPlayer == Opponent.BLACK) computerSide = 1;
         else computerSide = -1;
         if (next != null)
-            return new ComputerSide(state, computerSide, checkerForNextComputerMove);
-        else return new ComputerSide(state, computerSide, null);
+            return new Computer(state, computerSide, checkerForNextComputerMove);
+        else return new Computer(state, computerSide, null);
     }
 
     private final Cell[][] board = new Cell[8][8];
@@ -117,7 +117,7 @@ public class CheckersApp extends Application {
         primaryStage.show();
         createChoosingWindow();
         if (computerPlayer == Opponent.WHITE){
-            ComputerSide t = boardToState();
+            Computer t = boardToState();
             int[] i = t.minimaxStart(DEPTH);
             move(board[i[0]][i[1]].getChecker(),i[0],i[1],i[2],i[3]);
             if (next !=null){
@@ -245,7 +245,7 @@ public class CheckersApp extends Application {
 
             if (winner() != null) return;
             while (computerPlayer == player) {
-                ComputerSide t = boardToState();
+                Computer t = boardToState();
                 int[] i = t.minimaxStart(DEPTH);
                 move(board[i[0]][i[1]].getChecker(),i[0],i[1],i[2],i[3]);
                 if (next != null){
