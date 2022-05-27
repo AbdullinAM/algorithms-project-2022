@@ -7,25 +7,44 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.effect.BoxBlur;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Pair;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.*;
 
 public class CheckersApp extends Application {
 
     public static final int CELL_SIZE = 90;
-    public static final int UNREAL_DIR_OR_INDEX = -2;
+    //public static final int UNREAL_DIR_OR_INDEX = -2;
 
-    private ComputerSide boardStateForII;
+    private Pair<Integer,Integer> computerLastMove = null;
+
+    public ComputerSide boardToState(){
+        int[][] state = new int[8][8];
+        for (int y = 0; y < 8; y++)
+            for (int x = 0; x < 8; x++) {
+                if (!board[x][y].hasChecker()) continue;
+                switch (board[x][y].getChecker().getType()) {
+                    case BLACK -> state[y][x] = 1;
+                    case WHITE -> state[y][x] = -1;
+                    case B_KING -> state[y][x] = 3;
+                    default -> state[y][x] = -3;
+                }
+            }
+        int computerSide;
+        if (computerPlayer == Opponent.BLACK) computerSide = 1;
+        else computerSide = -1;
+        return new ComputerSide(state, computerSide, computerLastMove);
+    }
+
     private final Cell[][] board = new Cell[8][8];
     private final Group cellsGroup = new Group();
     private final Group checkersGroup = new Group();
@@ -63,7 +82,7 @@ public class CheckersApp extends Application {
 
     Checker next;
     Opponent player;
-    Opponent computerPlayer = Opponent.WHITE;
+    Opponent computerPlayer;
     int numWhiteCheckers;
     int numBlackCheckers;
 
@@ -87,14 +106,20 @@ public class CheckersApp extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        Parent board = createBoard();
+        Parent p = createBoard();
 
-        Scene scene = new Scene(board);
+        Scene scene = new Scene(p);
         primaryStage.setTitle("CheckersApp");
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         primaryStage.show();
         createChoosingWindow();
+        if (computerPlayer == Opponent.WHITE){
+            ComputerSide t = boardToState();
+            int[] i = t.minimaxStart(2);
+            computerLastMove = new Pair<>(i[3],i[2]);
+            move(board[i[0]][i[1]].getChecker(),i[0],i[1],i[2],i[3]);
+        }
     }
 
     public void createChoosingWindow(){
@@ -164,61 +189,67 @@ public class CheckersApp extends Application {
                 if ((x + y) % 2 != 0) {
                     if (y <= 2) checker = makeChecker(CheckerType.BLACK, x, y);
                     else if (y >= 5) checker = makeChecker(CheckerType.WHITE, x, y);
-                }
-                if (checker != null) {
-                    cell.setChecker(checker);
-                    checkersGroup.getChildren().add(checker);
+                    if (checker != null) {
+                        cell.setChecker(checker);
+                        checkersGroup.getChildren().add(checker);
+                    }
                 }
             }
         }
         return root;
     }
 
+    public void move(Checker checker, int x0, int y0, int newX, int newY){
+        List<MoveResult> result = tryMove(checker, newX, newY);
+
+
+        switch (result.get(0).getType()) {
+            case NONE -> checker.abortMove();
+            case NORMAL -> {
+                checker.move(newX, newY);
+                board[x0][y0].setChecker(null);
+                board[newX][newY].setChecker(checker);
+            }
+            case KILL -> {
+                checker.move(newX, newY);
+                board[x0][y0].setChecker(null);
+                board[newX][newY].setChecker(checker);
+                decreaseNumChecker(result.get(0).getChecker().getType(), result.size());
+                for (MoveResult m : result) {
+                    Checker otherChecker = m.getChecker();
+                    board[toBoardIndex(otherChecker.getX())][toBoardIndex(otherChecker.getY())].setChecker(null);
+                    checkersGroup.getChildren().remove(otherChecker);
+                }
+                if (winner() != null) {
+                    state.setText(winner().toString() + " победили");
+                }
+            }
+        }
+    }
+
     public Checker makeChecker(CheckerType type, int x, int y) {//возможно стоит перенести в класс
         Checker checker = new Checker(type, x, y);
 
         checker.setOnMouseReleased(event -> {//основная часть подойдет и для хода компьютера, нужно вынести в отдельную функцию
-            int newX = toBoardIndex(checker.getLayoutX());
-            int newY = toBoardIndex(checker.getLayoutY());
-            List<MoveResult> result;
-            /*if (player == computerPlayer) {//TODO
-                result = computerChoose();
+            if (computerPlayer == player) {
+                checker.abortMove();
+                err.setText("Ход шашкой другого игрока");
+                return;
             }
-            else */result = tryMove(checker, newX, newY);
 
-            int x0 = toBoardIndex(checker.getX());
-            int y0 = toBoardIndex(checker.getY());
+            move(checker,toBoardIndex(checker.getX()), toBoardIndex(checker.getY()),
+                    toBoardIndex(checker.getLayoutX()), toBoardIndex(checker.getLayoutY()));
 
 
-            switch (result.get(0).getType()) {
-                case NONE -> checker.abortMove();
-                case NORMAL -> {
-                    checker.move(newX, newY);
-                    board[x0][y0].setChecker(null);
-                    board[newX][newY].setChecker(checker);
-                }
-                case KILL -> {
-                    checker.move(newX, newY);
-                    board[x0][y0].setChecker(null);
-                    board[newX][newY].setChecker(checker);
-                    decreaseNumChecker(result.get(0).getChecker().getType(), result.size());
-                    for (MoveResult m : result) {
-                        Checker otherChecker = m.getChecker();
-                        board[toBoardIndex(otherChecker.getX())][toBoardIndex(otherChecker.getY())].setChecker(null);
-                        checkersGroup.getChildren().remove(otherChecker);
-                    }
-                    if (winner() != null) {
-                        state.setText(winner().toString() + " победили");
-                    }
-                }
+            while (computerPlayer == player) {
+                ComputerSide t = boardToState();
+                int[] i = t.minimaxStart(2);
+                computerLastMove = new Pair<>(i[3],i[2]);
+                move(board[i[0]][i[1]].getChecker(),i[0],i[1],i[2],i[3]);
+
             }
         });
         return checker;
-    }
-
-    public List<MoveResult> computerChoose() {//TODO
-        List<MoveResult> none = new ArrayList<>();
-        return none;
     }
 
     public int toBoardIndex(double pixel) {
@@ -325,13 +356,11 @@ public class CheckersApp extends Application {
             }
 
             for (int i = 1; i <= delta; i++) {
-
                 if (board[x0 + i * signX][y0 + i * signY].hasChecker()) {
                     if (sameColor(x0 + i * signX, y0 + i * signY, type)) {
                         err.setText("Попытка взятия собственной фишки");
                         return none;
                     } else {
-
                         result.add(new MoveResult(MoveType.KILL, board[x0 + i * signX][y0 + i * signY].getChecker()));
                     }
                 }
@@ -397,8 +426,6 @@ public class CheckersApp extends Application {
         }
         return false;
     }
-
-    //public List<Pair<Integer, Integer>> posibleMovings(){ }
 
     public static void main(String[] args) {
         launch(args);

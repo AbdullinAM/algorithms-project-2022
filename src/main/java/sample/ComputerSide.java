@@ -31,11 +31,29 @@ public class ComputerSide {
                 {-1, 0, -1, 0, -1, 0, -1, 0}};
     }
 
-    public ComputerSide(int[][] m, int side) {
-        rivalInQuestion = side;
-        state = new int[8][8];
+    public boolean isComputerSide(int i){
+        return side*i>0;
+    }
+
+    private int cost(){
+        int cost = 0;
         for (int i = 0; i < 8; i++)
-            System.arraycopy(m[i], 0, state[i], 0, 8);
+            for (int j = 0; j < 8; j++) {
+                if (isComputerSide(state[i][j]))
+                    cost+=Math.abs(state[i][j]);
+                else cost-=Math.abs(state[i][j]);
+            }
+        return cost;
+    }
+
+    public ComputerSide(int[][] m, int s, Pair<Integer,Integer> p) {
+        side = s;
+        rivalInQuestion = s;
+        state = m;
+        if (p != null && fightIsPossibleForPosition(p.getValue(), p.getKey())){
+            fighter = p;
+        }
+
     }
 
     public boolean outOfLimits(int x, int y) {
@@ -68,43 +86,66 @@ public class ComputerSide {
 
     Pair<Integer, Integer> fighter = null;
 
-
-    public List<Pair<Integer, Integer>> minimax(int depth) {
-        List<Pair<Integer, Integer>> l = new ArrayList<>();//TODO заменить
-        if (depth == 0) {
-        }
+    public int[] minimaxStart(int depth) {
+        int r;
+        if (rivalInQuestion==side) r = 0;
+        else r = 40;
+        int  y0, x0, newX, newY;
+        y0 = x0 = newX = newY =-2;
         if (fighter != null) {
             int y = fighter.getKey();
             int x =fighter.getValue();
             int checker = state[y][x];
-            if (Math.abs(checker) == 1) {//возможно стоит вынести в функцию
-                for (int i = -1; i < 2; i += 2)
-                    for (int j = -1; j < 2; j += 2) {
-                        if (!outOfLimits(x + 2 * i, y + 2 * j) && isEnemy(state[y + j][x + i]) && state[y - 2 * checker][x - 2 * checker] == 0) {
-                            ComputerSide newState = new ComputerSide(this, y, x, y + 2 * j, x + 2 * i, true);
-                            newState.minimax(depth - 1);
-                        }
-                    }
-            } else {
-                for (int i = -1; i < 2; i += 2)
-                    for (int j = -1; j < 2; j += 2)
-                        for (int n = 1; !outOfLimits(x + n * i, y + n * j); n++) {
-                            if (isFriend(state[y + j * n][x + i * n])) break;
-                            if (state[y + j * n][x + i * n] == 0) {
-                                ComputerSide newState = new ComputerSide(this, y, x, y + n * j, x + n * i, true);
-                                newState.minimax(depth - 1);
-                            } else {
-                                do {
-                                    n++;
-                                } while (!outOfLimits(y + j * n, x + i * n) && isEnemy(state[y + j * n][x + i * n]));
-                                if (state[y + j * n][x + i * n] == 0) {
-                                    ComputerSide newState = new ComputerSide(this, y, x, y + n * j, x + n * i, true);
-                                    newState.minimax(depth - 1);
-                                } else break;
-
+            if(rivalInQuestion == side)
+                if (Math.abs(checker) == 1) {//возможно стоит вынести в функцию
+                    for (int i = -1; i < 2; i += 2)
+                        for (int j = -1; j < 2; j += 2) {
+                            if (!outOfLimits(x + 2 * i, y + 2 * j) && isEnemy(state[y + j][x + i]) && state[y + 2 * j][x + 2 * i] == 0) {
+                                ComputerSide newState = new ComputerSide(this, y, x, y + 2 * j, x + 2 * i, true);
+                                int k = newState.minimax(depth - 1);
+                                if(k >= r){
+                                    r = k;
+                                    y0 = y;
+                                    x0 = x;
+                                    newX = x + 2 * i;
+                                    newY = y + 2 * j;
+                                }
                             }
                         }
-            }
+                } else {
+                    for (int i = -1; i < 2; i += 2)
+                        for (int j = -1; j < 2; j += 2)
+                            for (int n = 1; !outOfLimits(x + n * i, y + n * j); n++) {
+                                if (isFriend(state[y + j * n][x + i * n])) break;
+                                if (state[y + j * n][x + i * n] == 0) {
+                                    ComputerSide newState = new ComputerSide(this, y, x, y + n * j, x + n * i, true);
+                                    int k = newState.minimax(depth - 1);
+                                    if(k >= r){
+                                        r = k;
+                                        y0 = y;
+                                        x0 = x;
+                                        newX = x + n * i;
+                                        newY = y + n * j;
+                                    }
+                                } else {
+                                    do {
+                                        n++;
+                                    } while (!outOfLimits(y + j * n, x + i * n) && isEnemy(state[y + j * n][x + i * n]));
+                                    if (state[y + j * n][x + i * n] == 0) {
+                                        ComputerSide newState = new ComputerSide(this, y, x, y + n * j, x + n * i, true);
+                                        int k = newState.minimax(depth - 1);
+                                        if(k >= r){
+                                            r = k;
+                                            y0 = y;
+                                            x0 = x;
+                                            newX = x + n * i;
+                                            newY = y + n * j;
+                                        }
+                                    } else break;
+
+                                }
+                            }
+                }
         }
         else if (!fightIsPossibleForColor()) {
             for (int y = 0; y < 8; y++) {
@@ -114,11 +155,25 @@ public class ComputerSide {
                     if (Math.abs(checker) == 1) {
                         if (!outOfLimits(y + checker, x + checker) && state[y + checker][x + checker] == 0) {
                             ComputerSide newState = new ComputerSide(this, y, x, y + checker, x + checker, false);
-                            newState.minimax(depth - 1);
+                            int k = newState.minimax(depth - 1);
+                            if(k >= r){
+                                r = k;
+                                y0 = y;
+                                x0 = x;
+                                newX = x + checker;
+                                newY = y + checker;
+                            }
                         }
                         if (!outOfLimits(y + checker, x - checker) && state[y + checker][x - checker] == 0) {
                             ComputerSide newState = new ComputerSide(this, y, x, y + checker, x - checker, false);
-                            newState.minimax(depth - 1);
+                            int k = newState.minimax(depth - 1);
+                            if(k >= r){
+                                r = k;
+                                y0 = y;
+                                x0 = x;
+                                newX = x - checker;
+                                newY = y + checker;
+                            }
                         }
                     } else {
                         for (int i = -1; i < 2; i += 2)
@@ -126,7 +181,14 @@ public class ComputerSide {
                                 for (int n = 1; !outOfLimits(x + n * i, y + n * j); n++) {
                                     if (state[y][x] != 0) break;
                                     ComputerSide newState = new ComputerSide(this, y, x, y + n * j, x + n * i, false);
-                                    newState.minimax(depth - 1);
+                                    int k = newState.minimax(depth - 1);
+                                    if(k >= r){
+                                        r = k;
+                                        y0 = y;
+                                        x0 = x;
+                                        newX = x + n * i;
+                                        newY = y + n * j;
+                                    }
                                 }
 
                             }
@@ -142,9 +204,16 @@ public class ComputerSide {
                     if (Math.abs(checker) == 1) {
                         for (int i = -1; i < 2; i += 2)
                             for (int j = -1; j < 2; j += 2) {
-                                if (!outOfLimits(x + 2 * i, y + 2 * j) && isEnemy(state[y + j][x + i]) && state[y - 2 * checker][x - 2 * checker] == 0) {
+                                if (!outOfLimits(x + 2 * i, y + 2 * j) && isEnemy(state[y + j][x + i]) && state[y + 2*j][x + 2*i] == 0) {
                                     ComputerSide newState = new ComputerSide(this, y, x, y + 2 * j, x + 2 * i, true);
-                                    newState.minimax(depth - 1);
+                                    int k = newState.minimax(depth - 1);
+                                    if(k >= r){
+                                        r = k;
+                                        y0 = y;
+                                        x0 = x;
+                                        newX = x + 2 * i;
+                                        newY = y + 2 * j;
+                                    }
                                 }
                             }
                     } else {
@@ -154,14 +223,28 @@ public class ComputerSide {
                                     if (isFriend(state[y + j * n][x + i * n])) break;
                                     if (state[y + j * n][x + i * n] == 0) {
                                         ComputerSide newState = new ComputerSide(this, y, x, y + n * j, x + n * i, true);
-                                        newState.minimax(depth - 1);
+                                        int k = newState.minimax(depth - 1);
+                                        if(k >= r){
+                                            r = k;
+                                            y0 = y;
+                                            x0 = x;
+                                            newX = x + n * i;
+                                            newY = y + n * j;
+                                        }
                                     } else {
                                         do {
                                             n++;
                                         } while (!outOfLimits(y + j * n, x + i * n) && isEnemy(state[y + j * n][x + i * n]));
                                         if (state[y + j * n][x + i * n] == 0) {
                                             ComputerSide newState = new ComputerSide(this, y, x, y + n * j, x + n * i, true);
-                                            newState.minimax(depth - 1);
+                                            int k = newState.minimax(depth - 1);
+                                            if(k >= r){
+                                                r = k;
+                                                y0 = y;
+                                                x0 = x;
+                                                newX = x + n * i;
+                                                newY = y + n * j;
+                                            }
                                         } else break;
 
                                     }
@@ -169,22 +252,130 @@ public class ComputerSide {
                     }
                 }
 
-
-
-
         }
 
-        return l;
+        return new int[]{x0,y0,newX,newY};
     }
 
+    public int minOrMax(int a, int b) {
+        if(rivalInQuestion==side) return Math.max(a, b);
+        else return Math.min(a, b);
+    }
+
+    public int minimax(int depth) {
+        int r;
+        if (rivalInQuestion==side) r = 0;
+        else r = 40;
+        if (depth == 0) {
+            return cost();
+        }
+        if (fighter != null) {
+            int y = fighter.getKey();
+            int x =fighter.getValue();
+            int checker = state[y][x];
+            if(rivalInQuestion == side)
+            if (Math.abs(checker) == 1) {//возможно стоит вынести в функцию
+                for (int i = -1; i < 2; i += 2)
+                    for (int j = -1; j < 2; j += 2) {
+                        if (!outOfLimits(x + 2 * i, y + 2 * j) && isEnemy(state[y + j][x + i]) && state[y + 2 * j][x + 2 * i] == 0) {
+                            ComputerSide newState = new ComputerSide(this, y, x, y + 2 * j, x + 2 * i, true);
+                            r = minOrMax(newState.minimax(depth - 1), r);
+                        }
+                    }
+            } else {
+                for (int i = -1; i < 2; i += 2)
+                    for (int j = -1; j < 2; j += 2)
+                        for (int n = 1; !outOfLimits(x + n * i, y + n * j); n++) {
+                            if (isFriend(state[y + j * n][x + i * n])) break;
+                            if (state[y + j * n][x + i * n] == 0) {
+                                ComputerSide newState = new ComputerSide(this, y, x, y + n * j, x + n * i, true);
+                                r = minOrMax(newState.minimax(depth - 1), r);
+                            } else {
+                                do {
+                                    n++;
+                                } while (!outOfLimits(y + j * n, x + i * n) && isEnemy(state[y + j * n][x + i * n]));
+                                if (state[y + j * n][x + i * n] == 0) {
+                                    ComputerSide newState = new ComputerSide(this, y, x, y + n * j, x + n * i, true);
+                                    r = minOrMax(newState.minimax(depth - 1), r);
+                                } else break;
+
+                            }
+                        }
+            }
+        }
+        else if (!fightIsPossibleForColor()) {
+            for (int y = 0; y < 8; y++) {
+                for (int x = 0; x < 8; x++) {
+                    int checker = state[y][x];
+                    if (checker == 0 || !isFriend(checker)) continue;
+                    if (Math.abs(checker) == 1) {
+                        if (!outOfLimits(y + checker, x + checker) && state[y + checker][x + checker] == 0) {
+                            ComputerSide newState = new ComputerSide(this, y, x, y + checker, x + checker, false);
+                            r = minOrMax(newState.minimax(depth - 1), r);
+                        }
+                        if (!outOfLimits(y + checker, x - checker) && state[y + checker][x - checker] == 0) {
+                            ComputerSide newState = new ComputerSide(this, y, x, y + checker, x - checker, false);
+                            r = minOrMax(newState.minimax(depth - 1), r);
+                        }
+                    } else {
+                        for (int i = -1; i < 2; i += 2)
+                            for (int j = -1; j < 2; j += 2) {
+                                for (int n = 1; !outOfLimits(x + n * i, y + n * j); n++) {
+                                    if (state[y][x] != 0) break;
+                                    ComputerSide newState = new ComputerSide(this, y, x, y + n * j, x + n * i, false);
+                                    r = minOrMax(newState.minimax(depth - 1), r);
+                                }
+
+                            }
+                    }
+                }
+            }
+        }
+        else {
+            for (int y = 0; y < 8; y++)
+                for (int x = 0; x < 8; x++) {
+                    int checker = state[y][x];
+                    if (!isFriend(checker) || !fightIsPossibleForPosition(x, y)) continue;
+                    if (Math.abs(checker) == 1) {
+                        for (int i = -1; i < 2; i += 2)
+                            for (int j = -1; j < 2; j += 2) {
+                                if (!outOfLimits(x + 2 * i, y + 2 * j) && isEnemy(state[y + j][x + i]) && state[y + 2 * j][x + 2 * i] == 0) {
+                                    ComputerSide newState = new ComputerSide(this, y, x, y + 2 * j, x + 2 * i, true);
+                                    r = minOrMax(newState.minimax(depth - 1), r);
+                                }
+                            }
+                    } else {
+                        for (int i = -1; i < 2; i += 2)
+                            for (int j = -1; j < 2; j += 2)
+                                for (int n = 1; !outOfLimits(x + n * i, y + n * j); n++) {
+                                    if (isFriend(state[y + j * n][x + i * n])) break;
+                                    if (state[y + j * n][x + i * n] == 0) {
+                                        ComputerSide newState = new ComputerSide(this, y, x, y + n * j, x + n * i, true);
+                                        r = minOrMax(newState.minimax(depth - 1), r);
+                                    } else {
+                                        do {
+                                            n++;
+                                        } while (!outOfLimits(y + j * n, x + i * n) && isEnemy(state[y + j * n][x + i * n]));
+                                        if (state[y + j * n][x + i * n] == 0) {
+                                            ComputerSide newState = new ComputerSide(this, y, x, y + n * j, x + n * i, true);
+                                            r = minOrMax(newState.minimax(depth - 1), r);
+                                        } else break;
+
+                                    }
+                                }
+                    }
+                }
+        }
+        return r;
+    }
 
     public boolean fightIsPossibleForPosition(int x, int y) {
         boolean r = false;
-        if (Math.abs(rivalInQuestion) == 1) {
+        if (Math.abs(state[y][x]) == 1) {
             for (int i = -1; i < 2; i += 2)
                 for (int j = -1; j < 2; j += 2) {
                     if (!outOfLimits(x + 2 * i, y + 2 * j))
-                        r = r || isFriend(state[y + j][x + i]) && state[y + 2 * j][x + 2 * i] == 0;
+                        r = r || isEnemy(state[y + j][x + i]) && state[y + 2 * j][x + 2 * i] == 0;
                 }
             return r;
         } else {
@@ -205,7 +396,7 @@ public class ComputerSide {
     public boolean fightIsPossibleForColor() {
         for (int y = 0; y < 8; y++) {
             for (int x = 0; x < 8; x++) {
-                if (!isEnemy(state[y][x])) continue;
+                if (!isFriend(state[y][x])) continue;
                 if (fightIsPossibleForPosition(x, y)) {
                     return true;
                 }
