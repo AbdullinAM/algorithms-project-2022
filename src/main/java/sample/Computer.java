@@ -5,22 +5,15 @@ import javafx.util.Pair;
 public class Computer {
 
     public static final int KING_SORE = 5;
-    public static final int DEPTH = 7;
+    public static final int DEPTH = 4;
 
 
     int[][] state;
 
     static int side;
 
-    int rivalInQuestion = -1;
-
-    public boolean isFriend(int i) {
-        return rivalInQuestion * i > 0;
-    }
-
-    public boolean isEnemy(int i) {
-        return rivalInQuestion * i < 0;
-    }
+    int rivalInQuestion;
+    Pair<Integer, Integer> fighter = null;
 
     public Computer() {
         state = new int[][]{{0, 1, 0, 1, 0, 1, 0, 1},
@@ -31,21 +24,7 @@ public class Computer {
                 {-1, 0, -1, 0, -1, 0, -1, 0},
                 {0, -1, 0, -1, 0, -1, 0, -1},
                 {-1, 0, -1, 0, -1, 0, -1, 0}};
-    }
-
-    public boolean isComputerSide(int i){
-        return side*i>0;
-    }
-
-    private int cost(){
-        int cost = 0;
-        for (int i = 0; i < 8; i++)
-            for (int j = 0; j < 8; j++) {
-                if (isComputerSide(state[i][j]))
-                    cost+=Math.abs(state[i][j]);
-                else cost-=Math.abs(state[i][j]);
-            }
-        return cost;
+        side = rivalInQuestion = -1;
     }
 
     public Computer(int[][] m, int s, Pair<Integer,Integer> p) {
@@ -56,10 +35,6 @@ public class Computer {
             fighter = p;
         }
 
-    }
-
-    public boolean outOfLimits(int x, int y) {
-        return x > 7 || x < 0 || y > 7 || y < 0;
     }
 
     public Computer(Computer prev, int y, int x, int newY, int newX, boolean wasFight) {
@@ -86,7 +61,37 @@ public class Computer {
         }
     }
 
-    Pair<Integer, Integer> fighter = null;
+    public boolean isFriend(int i) {
+        return rivalInQuestion * i > 0;
+    }
+
+    public boolean isEnemy(int i) {
+        return rivalInQuestion * i < 0;
+    }
+
+    public boolean isComputerSide(int i){
+        return side*i>0;
+    }
+
+    public static boolean outOfLimits(int x, int y) {
+        return x > 7 || x < 0 || y > 7 || y < 0;
+    }
+
+    public int cost(){
+        int cost = 0;
+        for (int i = 0; i < 8; i++)
+            for (int j = 0; j < 8; j++) {
+                if (isComputerSide(state[i][j]))
+                    cost+=Math.abs(state[i][j]);
+                else cost-=Math.abs(state[i][j]);
+            }
+        return cost;
+    }
+
+    public int minOrMax(int a, int b) {
+        if(rivalInQuestion==side) return Math.max(a, b);
+        else return Math.min(a, b);
+    }
 
     public int[] minimaxStart(int depth) {
         int r;
@@ -260,11 +265,6 @@ public class Computer {
         }
 
         return new int[]{x0,y0,newX,newY};
-    }
-
-    public int minOrMax(int a, int b) {
-        if(rivalInQuestion==side) return Math.max(a, b);
-        else return Math.min(a, b);
     }
 
     public int minimax(int depth) {

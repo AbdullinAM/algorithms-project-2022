@@ -23,29 +23,8 @@ import static sample.Computer.DEPTH;
 public class CheckersApp extends Application {
 
     public static final int CELL_SIZE = 90;
-    //public static final int UNREAL_DIR_OR_INDEX = -2;
 
     private Pair<Integer,Integer> checkerForNextComputerMove = null;
-
-    public Computer boardToState(){
-        int[][] state = new int[8][8];
-        for (int y = 0; y < 8; y++)
-            for (int x = 0; x < 8; x++) {
-                if (!board[x][y].hasChecker()) continue;
-                switch (board[x][y].getChecker().getType()) {
-                    case BLACK -> state[y][x] = 1;
-                    case WHITE -> state[y][x] = -1;
-                    case B_KING -> state[y][x] = KING_SORE;
-                    default -> state[y][x] = -KING_SORE;
-                }
-            }
-        int computerSide;
-        if (computerPlayer == Opponent.BLACK) computerSide = 1;
-        else computerSide = -1;
-        if (next != null)
-            return new Computer(state, computerSide, checkerForNextComputerMove);
-        else return new Computer(state, computerSide, null);
-    }
 
     private final Cell[][] board = new Cell[8][8];
     private final Group cellsGroup = new Group();
@@ -88,28 +67,10 @@ public class CheckersApp extends Application {
     int numWhiteCheckers;
     int numBlackCheckers;
 
-    public void setPlayer() {
-        player = player.opposite();
-    }
-
-    public void decreaseNumChecker(CheckerType type, int n) {
-        if (type.isBlackColor()) numBlackCheckers -= n;
-        else numWhiteCheckers -= n;
-    }
-
-    public Opponent winner() {
-        if (numWhiteCheckers == 0)
-            return Opponent.BLACK;
-        else if (numBlackCheckers == 0)
-            return Opponent.WHITE;
-        return null;
-    }
 
     @Override
     public void start(Stage primaryStage) {
-
         Parent p = createBoard();
-
         Scene scene = new Scene(p);
         primaryStage.setTitle("CheckersApp");
         primaryStage.setResizable(false);
@@ -124,45 +85,6 @@ public class CheckersApp extends Application {
                 checkerForNextComputerMove = new Pair<>(i[3],i[2]);
             }
         }
-    }
-
-    public void createChoosingWindow(){
-        Stage choosingWindow = new Stage();
-
-        choosingWindow.initModality(Modality.APPLICATION_MODAL);
-        choosingWindow.setResizable(false);
-        choosingWindow.initStyle(StageStyle.UNDECORATED);
-        VBox p = new VBox();
-
-        Button white = new Button("white");
-        white.setOnAction(event->{
-            computerPlayer = Opponent.BLACK;
-            choosingWindow.close();
-        });
-        Button black = new Button("black");
-        black.setOnAction(event->{
-            computerPlayer = Opponent.WHITE;
-            choosingWindow.close();
-        });
-
-        p.setAlignment(Pos.CENTER);
-
-        p.getChildren().add(white);
-        p.getChildren().add(black);
-
-        white.setFocusTraversable(false);
-        black.setFocusTraversable(false);
-
-        white.setMaxWidth(Double.MAX_VALUE);
-        black.setMaxWidth(Double.MAX_VALUE);
-        white.setMinHeight(CELL_SIZE);
-        black.setMinHeight(CELL_SIZE);
-
-        Scene scene = new Scene(p, 3*CELL_SIZE, 2*CELL_SIZE);
-        choosingWindow.setScene(scene);
-        choosingWindow.setTitle("Выберите цвет");
-
-        choosingWindow.showAndWait();
     }
 
     public Parent createBoard() {
@@ -203,9 +125,66 @@ public class CheckersApp extends Application {
         return root;
     }
 
+    public void createChoosingWindow(){
+        Stage choosingWindow = new Stage();
+
+        choosingWindow.initModality(Modality.APPLICATION_MODAL);
+        choosingWindow.setResizable(false);
+        choosingWindow.initStyle(StageStyle.UNDECORATED);
+        VBox p = new VBox();
+
+        Button white = new Button("white");
+        white.setOnAction(event->{
+            computerPlayer = Opponent.BLACK;
+            choosingWindow.close();
+        });
+        Button black = new Button("black");
+        black.setOnAction(event->{
+            computerPlayer = Opponent.WHITE;
+            choosingWindow.close();
+        });
+
+        p.setAlignment(Pos.CENTER);
+
+        p.getChildren().add(white);
+        p.getChildren().add(black);
+
+        white.setFocusTraversable(false);
+        black.setFocusTraversable(false);
+
+        white.setMaxWidth(Double.MAX_VALUE);
+        black.setMaxWidth(Double.MAX_VALUE);
+        white.setMinHeight(CELL_SIZE);
+        black.setMinHeight(CELL_SIZE);
+
+        Scene scene = new Scene(p, 3*CELL_SIZE, 2*CELL_SIZE);
+        choosingWindow.setScene(scene);
+
+        choosingWindow.showAndWait();
+    }
+
+    public Computer boardToState(){
+        int[][] state = new int[8][8];
+        for (int y = 0; y < 8; y++)
+            for (int x = 0; x < 8; x++) {
+                if (!board[x][y].hasChecker()) continue;
+                switch (board[x][y].getChecker().getType()) {
+                    case BLACK -> state[y][x] = 1;
+                    case WHITE -> state[y][x] = -1;
+                    case B_KING -> state[y][x] = KING_SORE;
+                    default -> state[y][x] = -KING_SORE;
+                }
+            }
+        int computerSide;
+        if (computerPlayer == Opponent.BLACK) computerSide = 1;
+        else computerSide = -1;
+        if (next != null)
+            return new Computer(state, computerSide, checkerForNextComputerMove);
+        else return new Computer(state, computerSide, null);
+    }
+
     public void move(Checker checker, int x0, int y0, int newX, int newY){
         List<MoveResult> result = tryMove(checker, newX, newY);
-
         switch (result.get(0).getType()) {
             case NONE -> checker.abortMove();
             case NORMAL -> {
@@ -230,7 +209,7 @@ public class CheckersApp extends Application {
         }
     }
 
-    public Checker makeChecker(CheckerType type, int x, int y) {//возможно стоит перенести в класс
+    public Checker makeChecker(CheckerType type, int x, int y) {
         Checker checker = new Checker(type, x, y);
 
         checker.setOnMouseReleased(event -> {
@@ -243,27 +222,26 @@ public class CheckersApp extends Application {
             move(checker,toBoardIndex(checker.getX()), toBoardIndex(checker.getY()),
                     toBoardIndex(checker.getLayoutX()), toBoardIndex(checker.getLayoutY()));
 
-            if (winner() != null) return;
+            if (winner() != null) {
+                state.setText(winner().toString() + " победили");
+                return;
+            }
             while (computerPlayer == player) {
                 Computer t = boardToState();
                 int[] i = t.minimaxStart(DEPTH);
+                if (i[0] == -2) {
+                    state.setText(computerPlayer.opposite().toString() + " победили. " + computerPlayer.toString() + " не могут сделать ход.");
+                    if (computerPlayer == Opponent.WHITE) numWhiteCheckers = 0;
+                    else numBlackCheckers = 0;
+                }
                 move(board[i[0]][i[1]].getChecker(),i[0],i[1],i[2],i[3]);
                 if (next != null){
                     checkerForNextComputerMove = new Pair<>(i[3],i[2]);
-                }//TODO дописаь выход при невозможности хода
+                }
 
             }
         });
         return checker;
-    }
-
-    public int toBoardIndex(double pixel) {
-        return (int) (pixel + CELL_SIZE / 2) / CELL_SIZE;
-    }
-
-    public boolean sameColor(int x, int y, CheckerType type) {
-        return board[x][y].hasChecker() && (board[x][y].getChecker().getType().isBlackColor() && type.isBlackColor()
-                || board[x][y].getChecker().getType().isWhiteColor() && type.isWhiteColor());
     }
 
     public List<MoveResult> tryMove(Checker checker, int newX, int newY) {
@@ -430,6 +408,32 @@ public class CheckersApp extends Application {
             }
         }
         return false;
+    }
+
+    public Opponent winner() {
+        if (numWhiteCheckers == 0)
+            return Opponent.BLACK;
+        else if (numBlackCheckers == 0)
+            return Opponent.WHITE;
+        return null;
+    }
+
+    public int toBoardIndex(double pixel) {
+        return (int) (pixel + CELL_SIZE / 2) / CELL_SIZE;
+    }
+
+    public void setPlayer() {
+        player = player.opposite();
+    }
+
+    public void decreaseNumChecker(CheckerType type, int n) {
+        if (type.isBlackColor()) numBlackCheckers -= n;
+        else numWhiteCheckers -= n;
+    }
+
+    public boolean sameColor(int x, int y, CheckerType type) {
+        return board[x][y].hasChecker() && (board[x][y].getChecker().getType().isBlackColor() && type.isBlackColor()
+                || board[x][y].getChecker().getType().isWhiteColor() && type.isWhiteColor());
     }
 
     public static void main(String[] args) {
