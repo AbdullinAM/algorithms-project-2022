@@ -104,7 +104,7 @@ public class Computer {
             int x =fighter.getValue();
             int checker = state[y][x];
             if(rivalInQuestion == side)
-                if (Math.abs(checker) == 1) {//возможно стоит вынести в функцию
+                if (Math.abs(checker) == 1) {
                     for (int i = -1; i < 2; i += 2)
                         for (int j = -1; j < 2; j += 2) {
                             if (!outOfLimits(x + 2 * i, y + 2 * j) && isEnemy(state[y + j][x + i]) && state[y + 2 * j][x + 2 * i] == 0) {
