@@ -1,64 +1,142 @@
-import java.util.*;
+import com.google.common.collect.Iterators;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.AbstractSet;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Random;
+import java.util.SortedSet;
+import java.util.Stack;
+import java.util.TreeSet;
 
 public class SkipList<T extends Comparable<T>> extends AbstractSet<T> implements SortedSet<T> {
 
-    private final int MAX_LEVEL = 914748999;
+    private static Random entropy = new Random();
 
-    private Node<T> head;
-    // tail всегда null;
+    private static boolean heads() { return entropy.nextBoolean(); }
 
-    private int heightOfSkipList; // чтобы не было быстрого роста
     private int size;
 
-    private SortedMap<T, Integer> mapOfNodes = new TreeMap<>();
+    // tail всегда null;
+    private @Nullable Node<T> head;
 
-    public Random random = new Random();
+    SkipList() { }
 
-    public SkipList() {
-        this.head = new Node<>(null, MAX_LEVEL);
-        this.heightOfSkipList = 1;
-        this.size = 0;
+    SkipList(T firstKey) {
+        this.head = new Node<>(firstKey);
     }
 
-    public TreeSet<T> getKeys() {
-        TreeSet<T> set = new TreeSet<>();
-        for (Map.Entry<T, Integer> node : mapOfNodes.entrySet()) {
-            set.add(node.getKey());
+    void insert(T key)
+    {
+        final Node<T> born = new Node<>(key);
+        if (head == null) // so, no head?
+            head = born;
+        else
+        {
+            final @NotNull Stack<Node<T>> trace = new Stack<>();
+            final @Nullable Node<T> leftmost = leftmost(head, key, nOfLevels() - 1, trace);
+            if (leftmost == null) // new head
+            {
+                for (int level = 0; level < nOfLevels(); level++)
+                    born.connect(head, level);
+                this.head = born;
+            }
+            else
+            {
+                trace.push(leftmost);
+                bubbleUp(born, trace);
+            }
         }
-        return set;
-
+        size++;
     }
 
-    private boolean flipCoin() {
-        return random.nextBoolean();
+    private void bubbleUp(final @NotNull Node<T> node, final @NotNull Stack<Node<T>> trace)
+    {
+        int atLevel = 0;
+        do {
+            final Node<T> parent = (trace.empty()) ? head : trace.pop();
+            parent.connect(node, atLevel++);
+        } while (heads());
     }
 
-
-    private int flipAndIncrementLevel() {
-        int level = 0;
-        for (int i = 0; i < head.getValue(); i++) {
-            if (flipCoin()) {
-                level++;
-                if (level == this.heightOfSkipList) {
-                    heightOfSkipList++;
-                }
-            } else
-                break;
+    boolean delete(T key)
+    {
+        if (head == null)
+            return false;
+        if (equalTo(head.key(), key))
+        {
+            head = (head.hasNext(0)) ? head.child(0) : null;
+            size--;
+            return true;
         }
-        return level;
+        final @Nullable Node<T> leftmost = leftmost(key);
+        if (leftmost == null || !equalTo(leftmost.key(), key))
+            return false;
+        for (int level = 0; level < leftmost.parentLevelSize(); level++)
+            Node.wire(leftmost.parent(level), leftmost.child(level), level);
+        size--;
+        return true;
     }
 
+    List<T> keys()
+    {
+        final List<T> keys = new LinkedList<>();
+        Iterators.addAll(keys, iterator());
+        return keys;
+    }
 
-    public void printL() {
-        for (Map.Entry<T, Integer> node : mapOfNodes.entrySet()) {
-            System.out.println(node.getKey() + " " + node.getValue());
+    boolean contains(T key)
+    {
+        Node<T> leftmost = leftmost(key);
+        return (leftmost != null) && (equalTo(leftmost.key(), key));
+    }
+
+    private @Nullable Node<T> leftmost(T key) {
+        return (head != null) ? leftmost(head, key, nOfLevels() - 1, null) : null;
+    }
+
+    // find closest to "key" element from the left. Null if key should become a new head.
+    private @Nullable Node<T> leftmost(@NotNull Node<T> current, T key, int atLevel,
+                                       @Nullable Stack<Node<T>> trace)
+    {
+        if (equalTo(current.key(), key))
+            return current;
+        else if (lessThan(current.key(), key))
+        {
+            // find first node >= key or reach the end of level
+            @NotNull Node<T> leftmostOnCurrentLevel = current;
+            while (leftmostOnCurrentLevel.hasNext(atLevel) && lessOrEqual(leftmostOnCurrentLevel.next(atLevel).key(), key))
+                leftmostOnCurrentLevel = leftmostOnCurrentLevel.next(atLevel);
+            return (atLevel > 0) ?
+                    leftmost(leftmostOnCurrentLevel, key, atLevel - 1, push(leftmostOnCurrentLevel, trace)) :
+                    leftmostOnCurrentLevel;
         }
+        else // current > key
+            return null;
     }
 
+    private Stack<Node<T>> push(@NotNull Node<T> node, @Nullable Stack<Node<T>> stack)
+    {
+        if (stack == null)
+            return null;
+        stack.push(node);
+        return stack;
+    }
 
+    private int nOfLevels() {
+        return (head == null) ? 0 :
+                (head.childLevelsSize() == 0) ? 1 :
+                        head.childLevelsSize();
+    }
+
+    @NotNull
     @Override
     public Iterator<T> iterator() {
-        return null;
+        return new SkipIterator(0);
     }
 
     @Override
@@ -66,185 +144,102 @@ public class SkipList<T extends Comparable<T>> extends AbstractSet<T> implements
         return this.size;
     }
 
-    public void skipInsert(T key) {
-
-        if (search(key))
-            return;
-
-        int level = flipAndIncrementLevel();
-
-        Node<T> newNode = new Node<>(key,level);
-
-        Node searcher = head;
-
-        for (int i = heightOfSkipList - 1; i >= 0; i--) {
-            while (null != searcher.next[i]) {
-                if (greaterThan((T) searcher.next[i].getKey(), key)) {
-                    break;
-                }
-                searcher = searcher.next[i];
-            }
-
-            if (i <= level && !newNode.equals(searcher.next[i])) {
-                newNode.next[i] = searcher.next[i];
-                searcher.next[i] = newNode;
-            }
-        }
-
-        mapOfNodes.put(newNode.getKey(), newNode.getValue());
-
-        size++;
-    }
-
-    public boolean delete(T key) {
-        Node searcher = head;
-        boolean result = false;
-        for (int i = heightOfSkipList - 1; i >= 0; i--) {
-            while (null != searcher.next[i]) {
-                if (greaterThan((T) searcher.next[i].getKey(), key))
-                    break;
-
-                if (equalTo((T) searcher.next[i].getKey(), key)) {
-                    searcher.next[i] = searcher.next[i].next[i];
-                    mapOfNodes.remove(key);
-                    result = true;
-                    size--;
-                    break;
-                }
-                searcher = searcher.next[i];
-            }
-        }
-
-
-        return result;
-    }
-
-
-    public void levelPrint() {
-
-        Node cursor = head;
-        int start = head.getValue() - 1 ;
-        while (null == cursor.next[start]) {
-            start--;
-        }
-
-        cursor = head;
-        List<Node> ref = new ArrayList<>();
-
-        while (null != cursor) {
-            ref.add(cursor);
-            cursor = cursor.next[0];
-        }
-
-        for (int i = 0; i <= start; i++) {
-
-            cursor = head;
-            cursor = cursor.next[i];
-            System.out.print( "Layer "+ i + " | head |");
-
-            int levelIndex = 1;
-            while (null != cursor) {
-
-                if (i > 0) {
-                    while (ref.get(levelIndex).getKey() != cursor.getKey()) {
-                        levelIndex++;
-                        System.out.print( "-------------------------");
-                    }
-                    levelIndex++;
-                }
-
-                System.out.print( "----> " + cursor);
-                cursor = cursor.next[i];
-            }
-
-            System.out.println();
-        }
-    }
-
-    public boolean search(T key) {
-        TreeSet<T> set = getKeys();
-        for (T x : set) {
-            if (x.compareTo(key) == 0)
-                return true;
-        }
-        return false;
-
-    }
-
-
     @Override
     public Comparator<? super T> comparator() {
-        return null;
+        return Comparator.naturalOrder();
     }
 
+    @NotNull
     @Override
     public SortedSet<T> subSet(T fromElement, T toElement) {
-        TreeSet<T> set = getKeys();
-        TreeSet<T> subSet = new TreeSet<>();
-
-        if (greaterThan(fromElement, toElement) || toElement.compareTo(set.last()) > 0 ||
-                fromElement.compareTo(set.last()) > 0 || fromElement.compareTo(set.first()) < 0 ||
-                toElement.compareTo(set.first()) < 0) {
-            throw new IllegalArgumentException();
-        }
-
-        for (T key : set) {
-            if (key.compareTo(fromElement) >= 0 && key.compareTo(toElement) < 0) {
-                subSet.add(key);
-            }
-        }
-
-        return subSet;
+        final TreeSet<T> result = new TreeSet<>();
+        iterator().forEachRemaining(result::add);
+        return result.subSet(fromElement, toElement);
     }
 
+    @NotNull
     @Override
     public SortedSet<T> headSet(T toElement) {
-        TreeSet<T> set = getKeys();
-        TreeSet<T> headSet = new TreeSet<>();
-
-        if (toElement.compareTo(set.last()) > 0 || toElement.compareTo(set.first()) < 0) {
-            throw new IllegalArgumentException();
-        }
-
-        for (T key : set) {
-            if (key.compareTo(toElement) < 0) {
-                headSet.add(key);
-            }
-        }
-
-        return headSet;
+        final TreeSet<T> result = new TreeSet<>();
+        iterator().forEachRemaining(result::add);
+        return result.headSet(toElement);
     }
 
+    @NotNull
     @Override
     public SortedSet<T> tailSet(T fromElement) {
-        TreeSet<T> set = getKeys();
-        TreeSet<T> tailSet = new TreeSet<>();
-        for (T key : set) {
-            if (key.compareTo(fromElement) >= 0) {
-                tailSet.add(key);
-            }
-        }
-
-        return tailSet;
+        final TreeSet<T> result = new TreeSet<>();
+        iterator().forEachRemaining(result::add);
+        return result.tailSet(fromElement);
     }
 
     @Override
     public T first() {
-        return mapOfNodes.firstKey();
+        if (head == null)
+            throw new NoSuchElementException();
+        return head.key();
     }
 
     @Override
     public T last() {
-        return mapOfNodes.lastKey();
+        return Iterators.getLast(iterator());
     }
 
+    private class SkipIterator implements Iterator<T> {
+
+        private Node<T> current;
+        private int level;
+        private boolean firstTime = true;
+
+        SkipIterator(int level) {
+            this.current = head;
+            this.level = level;
+        }
+
+        @Override
+        public boolean hasNext()
+        {
+            return current.hasNext(level);
+        }
+
+        @Override
+        public T next()
+        {
+            if (firstTime)
+            {
+                firstTime = false;
+                return current.key();
+            }
+            current = current.next(level);
+            return current.key();
+        }
+    }
 
     private boolean equalTo(T x, T y) {
         return x.compareTo(y) == 0;
     }
 
-    private boolean greaterThan(T x, T y) {
-        return x.compareTo(y) > 0;
+    private boolean lessThan(T x, T y) {
+        return x.compareTo(y) < 0;
     }
 
+    private boolean lessOrEqual(T x, T y)
+    {
+        return (lessThan(x, y) || equalTo(x, y));
+    }
+
+    @Override
+    public String toString()
+    {
+        final StringBuilder result = new StringBuilder();
+        for (int level = 0; level < nOfLevels(); level++)
+        {
+            final List<String> elementsAtLevel = new LinkedList<>();
+            new SkipIterator(level)
+                    .forEachRemaining(el -> elementsAtLevel.add(el.toString()));
+            result.append(String.join(" <-> ", elementsAtLevel));
+            result.append("\n");
+        }
+        return result.toString();
+    }
 }
